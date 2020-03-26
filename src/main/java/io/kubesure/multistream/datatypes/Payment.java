@@ -16,6 +16,38 @@ public class Payment implements Comparable<Payment>{
         this.timestamp = timestamp;
     }
 
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public int getAmount(){
+        return amount;
+    }
+
+    public void setAmount(int amount){
+        this.amount = amount;
+    }
+
+    public String getCif(){
+        return cif;
+    }
+
+    public void setCif(String cif){
+        this.cif = cif;
+    }
+
+    public void setAccount(String account){
+        this.account = account;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
     public int compareTo(Payment payment){
            return Long.compare(this.timestamp, payment.timestamp); 
     }

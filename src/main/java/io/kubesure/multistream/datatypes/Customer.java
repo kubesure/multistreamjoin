@@ -8,6 +8,30 @@ public class Customer implements Comparable<Customer>{
 
     public Customer() {}
 
+    public void setAccount(String account){
+        this.account = account;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getCif(){
+        return cif;
+    }
+
+    public void setCif(String cif){
+        this.cif = cif;
+    }
+
     public Customer(String cif,String account, Long timestamp){
         this.cif = cif;
         this.account = account;

@@ -14,6 +14,30 @@ public class Trade implements Comparable<Trade>{
         this.timestamp = timestamp;
     }
 
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public int getAmount(){
+        return amount;
+    }
+
+    public void setAmount(int amount){
+        this.amount = amount;
+    }
+
+    public String getCif(){
+        return cif;
+    }
+
+    public void setCif(String cif){
+        this.cif = cif;
+    }
+
     public int compareTo(Trade trade){
            return Long.compare(this.timestamp, trade.timestamp); 
     }
