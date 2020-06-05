@@ -1,76 +1,85 @@
 package io.kubesure.multistream.datatypes;
 
+import org.joda.time.DateTime;
+
 @SuppressWarnings("unused")
-public class Payment implements Comparable<Payment>{
-    private String cif;
-    private int amount;
+
+public class Payment {
+
+    private String transactionID;
+    private DateTime transactionDate;
+    private String clientID;
+    private String status;
     private String account;
-    private Long timestamp;
+    private Float amount;
+    private String referenceNumber;
 
     public Payment() {}
-
-    public Payment(String cif,int amount, String account,Long timestamp){
-        this.cif = cif;
-        this.amount = amount;
-        this.account = account;
-        this.timestamp = timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public int getAmount(){
-        return amount;
-    }
-
-    public void setAmount(int amount){
-        this.amount = amount;
-    }
-
-    public String getCif(){
-        return cif;
-    }
-
-    public void setCif(String cif){
-        this.cif = cif;
-    }
-
-    public void setAccount(String account){
-        this.account = account;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public int compareTo(Payment payment){
-           return Long.compare(this.timestamp, payment.timestamp); 
-    }
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("Payment amount - ")
           .append(amount)
           .append(" from customer - ")
-          .append(cif)
+          .append(clientID)
           .append(" of amount - ")
           .append(amount);
         return sb.toString();
     }
 
-    @Override
-    public boolean equals(Object o){
-        if (this == o) {
-            return true;
-        } else if (o != null && getClass() == o.getClass()) {
-            Payment that = (Payment) o;
-            return ( (this.cif.equals(that.cif)) && (this.timestamp.equals(that.timestamp)) ); 
-        }
-        return false;
+    public String getTransactionID() {
+        return transactionID;
+    }
+
+    public void setTransactionID(String transactionID) {
+        this.transactionID = transactionID;
+    }
+
+    public DateTime getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(DateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public String getClientID() {
+        return clientID;
+    }
+
+    public void setClientID(String clientID) {
+        this.clientID = clientID;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public Float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Float amount) {
+        this.amount = amount;
+    }
+
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
     }
 }
