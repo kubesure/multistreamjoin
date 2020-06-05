@@ -103,4 +103,8 @@ public class Purchase {
     public void setBuySell(String buySell) {
         this.buySell = buySell;
     }
+
+    public long getEventTime(){
+        return this.transactionDate.getMillis();
+    }
 }

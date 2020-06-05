@@ -2,14 +2,20 @@ package io.kubesure.multistream.job;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.co.KeyedCoProcessFunction;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -27,13 +33,20 @@ public class MultiStreamJob {
 
 	private static final Logger log = LoggerFactory.getLogger(MultiStreamJob.class);
 	public static ParameterTool parameterTool;
+
+	static final OutputTag<Purchase> unmatchedPurchases = new OutputTag<Purchase>("unmatchedPurchases") {
+        private static final long serialVersionUID = 13434343455656L;
+    };
+	static final OutputTag<Payment> unmatchedPayments = new OutputTag<Payment>("unmatchedPayments") {
+        private static final long serialVersionUID = 13434343455656L;
+    };
 	
 	public static void main(String[] args) throws Exception {
 		parameterTool = Util.readProperties();
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-		DataStream<Purchase> purchaseStream = env
+		DataStream<Purchase> purchaseInput = env
 		            	.addSource(
 							new FlinkKafkaConsumer<>(
 								parameterTool.getRequired("kafka.purchase.input.topic"), 
@@ -52,7 +65,7 @@ public class MultiStreamJob {
 								}
 						}).name("Purchase Input");
 
-						DataStream<Payment> paymentStream = env
+		DataStream<Payment> paymentInput = env
 		            	.addSource(
 							new FlinkKafkaConsumer<>(
 								parameterTool.getRequired("kafka.payment.input.topic"), 
@@ -72,14 +85,84 @@ public class MultiStreamJob {
 						}).name("Payment Input");						
 
 
-		DataStream<Deal> dealStream = purchaseStream
-		 				.keyBy(r -> r.getTransactionID())
-						.connect(paymentStream)
-						.process(new EventTimeJoin());
+		DataStream<Purchase> purchases = purchaseInput
+						.keyBy(purchase -> purchase.getTransactionID());
+						 
+		DataStream<Payment> payments = paymentInput
+						.keyBy(payment -> payment.getTransactionID());
+						 
+		SingleOutputStreamOperator<Deal> processed = purchases
+						.connect(payments)
+						.process(new DealMaker());
+						
+		processed.getSideOutput(unmatchedPayments).print();
 
-		dealStream.print();			
+		processed.getSideOutput(unmatchedPayments).print();
+						
+		processed.print();
 
 		env.execute("Multistream Event Time Join");
+	}
+
+	public static class DealMaker extends KeyedCoProcessFunction<String, Purchase, Payment, Deal> {
+
+		private static final long serialVersionUID = 13434343455656L;
+		private static final Logger log = LoggerFactory.getLogger(DealMaker.class);
+		
+		private ValueState<Purchase> purchaseState = null;
+		private ValueState<Payment> paymentState = null;
+	
+		public DealMaker() {}
+	
+		@Override
+		public void open(Configuration config) {
+			purchaseState = getRuntimeContext().getState(new ValueStateDescriptor<>("saved purchase", Purchase.class));
+			paymentState = getRuntimeContext().getState(new ValueStateDescriptor<>("saved payment", Payment.class));
+		}
+	
+		@Override
+		public void processElement1(Purchase purchase, 
+									KeyedCoProcessFunction<String, Purchase, Payment,Deal>.Context ctx,
+									Collector<Deal> out) throws Exception {
+			Payment payment = paymentState.value();
+			if (payment != null) {
+				paymentState.clear();
+				ctx.timerService().deleteEventTimeTimer(payment.getEventTime());
+				out.collect(new Deal(purchase,payment));
+			} else {
+				purchaseState.update(purchase);
+				ctx.timerService().registerEventTimeTimer(purchase.getEventTime());
+			}
+	
+		}
+	
+		@Override
+		public void processElement2(Payment payment, 
+									KeyedCoProcessFunction<String, Purchase, Payment, Deal>.Context ctx,
+									Collector<Deal> out) throws Exception {
+	
+			Purchase purchase = purchaseState.value();
+			if (purchase != null) {
+				purchaseState.clear();
+				ctx.timerService().deleteEventTimeTimer(purchase.getEventTime());
+				out.collect(new Deal(purchase,payment));
+			} else {
+				purchaseState.update(purchase);
+				ctx.timerService().registerEventTimeTimer(payment.getEventTime());
+			}        
+		}
+	
+		@Override
+		public void onTimer(long t, OnTimerContext ctx, Collector<Deal> out) throws Exception {
+			if (purchaseState.value() != null) {
+				ctx.output(unmatchedPurchases, purchaseState.value());
+				purchaseState.clear();
+			}
+			if (paymentState.value() != null) {
+				ctx.output(unmatchedPayments, paymentState.value());
+				paymentState.clear();
+			}        
+		}
 	}
 
 	private static class JSONToPurchase 

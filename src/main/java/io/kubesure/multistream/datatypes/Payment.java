@@ -2,8 +2,6 @@ package io.kubesure.multistream.datatypes;
 
 import org.joda.time.DateTime;
 
-@SuppressWarnings("unused")
-
 public class Payment {
 
     private String transactionID;
@@ -81,5 +79,9 @@ public class Payment {
 
     public void setReferenceNumber(String referenceNumber) {
         this.referenceNumber = referenceNumber;
+    }
+
+    public long getEventTime(){
+        return this.transactionDate.getMillis();
     }
 }
