@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 
@@ -27,6 +28,11 @@ public class KafkaUtil {
 		return producer;
 	}
 
-
+	public static FlinkKafkaConsumer<String> newFlinkKafkaConsumer(String topic, ParameterTool parameterTool) {
+		return new FlinkKafkaConsumer<>(
+			parameterTool.getRequired(topic), 
+			new SimpleStringSchema(), 
+			parameterTool.getProperties());
+	}
     
 }

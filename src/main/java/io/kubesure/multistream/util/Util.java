@@ -19,11 +19,8 @@ public class Util {
 	}
 
 	public static ParameterTool readProperties() throws Exception {
-		//ParameterTool parameterTool = ParameterTool.fromPropertiesFile("prospectstream.properties");
-		
-		
 		ParameterTool parameterTool = ParameterTool.fromPropertiesFile
-								(Util.class.getClassLoader().getResourceAsStream("prospectstream.properties"));
+								(Util.class.getClassLoader().getResourceAsStream("stream.properties"));
 		return parameterTool;
 	}
 	

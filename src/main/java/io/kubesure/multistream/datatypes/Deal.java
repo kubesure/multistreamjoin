@@ -1,6 +1,11 @@
 package io.kubesure.multistream.datatypes;
 
-public class Deal {
+import java.io.Serializable;
+
+public class Deal implements Serializable{
+   
+    private static final long serialVersionUID = 4694386434588446195L;
+    
     private Purchase purchase;
     private Payment payment;
 
@@ -25,5 +30,14 @@ public class Deal {
 
     public void setPurchase(Purchase purchase) {
         this.purchase = purchase;
+    }
+
+
+    public String toString(){
+        return new StringBuilder()
+        .append("Deal - ")
+        .append(purchase.getTransactionID())
+        .append(" Executed - ")
+        .append(payment.getStatus()).toString();
     }
 }

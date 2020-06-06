@@ -1,9 +1,13 @@
 package io.kubesure.multistream.datatypes;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
-public class Payment {
+public class Payment implements Event, Serializable {
 
+    private static final long serialVersionUID = -6315541012554502065L;
+    
     private String transactionID;
     private DateTime transactionDate;
     private String clientID;
@@ -11,8 +15,6 @@ public class Payment {
     private String account;
     private Float amount;
     private String referenceNumber;
-
-    public Payment() {}
 
     public String toString(){
         StringBuilder sb = new StringBuilder();

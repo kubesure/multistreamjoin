@@ -1,7 +1,6 @@
 package io.kubesure.multistream.job;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.java.utils.ParameterTool;
@@ -13,7 +12,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.KeyedCoProcessFunction;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -47,72 +45,58 @@ public class MultiStreamJob {
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
 		DataStream<Purchase> purchaseInput = env
-		            	.addSource(
-							new FlinkKafkaConsumer<>(
-								parameterTool.getRequired("kafka.purchase.input.topic"), 
-								new SimpleStringSchema(), 
-								parameterTool.getProperties()))
-						.flatMap(new JSONToPurchase())
-						.assignTimestampsAndWatermarks
-							(new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(10)) {
-								private static final long serialVersionUID = -686876346234753642L;	
-								@Override
-								public long extractTimestamp(Purchase element) {
-									if (log.isInfoEnabled()) {
-										log.info("New purchase event time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
-									}
-									return element.getTransactionDate().getMillis();
-								}
-						}).name("Purchase Input");
+		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
+				.flatMap(new JSONToPurchase())
+				.assignTimestampsAndWatermarks
+					(new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(10)) {
+						private static final long serialVersionUID = -686876346234753642L;	
+						@Override
+						public long extractTimestamp(Purchase element) {
+							if(log.isInfoEnabled()) {
+								log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
+							}
+							return element.getTransactionDate().getMillis();
+						}
+				}).name("Purchase Input");
 
 		DataStream<Payment> paymentInput = env
-		            	.addSource(
-							new FlinkKafkaConsumer<>(
-								parameterTool.getRequired("kafka.payment.input.topic"), 
-								new SimpleStringSchema(), 
-								parameterTool.getProperties()))
-						.flatMap(new JSONToPayment())
-						.assignTimestampsAndWatermarks
-							(new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(10)) {
-								private static final long serialVersionUID = -686876346234753642L;	
-								@Override
-								public long extractTimestamp(Payment element) {
-									if(log.isInfoEnabled()) {
-										log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
-									}
-									return element.getTransactionDate().getMillis();
-								}
-						}).name("Payment Input");						
+		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
+				.flatMap(new JSONToPayment())
+				.assignTimestampsAndWatermarks
+					(new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(10)) {
+						private static final long serialVersionUID = -686876346234753642L;	
+						@Override
+						public long extractTimestamp(Payment element) {
+							if(log.isInfoEnabled()) {
+								log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
+							}
+							return element.getTransactionDate().getMillis();
+						}
+				}).name("Payment Input");						
 
+		SingleOutputStreamOperator<Deal> processed = purchaseInput
+						.connect(paymentInput)
+						.keyBy((Purchase::getTransactionDate),(Payment::getTransactionDate))
+						.process(new DealMatcher());		
 
-		DataStream<Purchase> purchases = purchaseInput
-						.keyBy(purchase -> purchase.getTransactionID());
-						 
-		DataStream<Payment> payments = paymentInput
-						.keyBy(payment -> payment.getTransactionID());
-						 
-		SingleOutputStreamOperator<Deal> processed = purchases
-						.connect(payments)
-						.process(new DealMaker());
-						
 		processed.getSideOutput(unmatchedPayments).print();
 
 		processed.getSideOutput(unmatchedPayments).print();
 						
-		processed.print();
+		processed.print(); 
+
+		
 
 		env.execute("Multistream Event Time Join");
 	}
 
-	public static class DealMaker extends KeyedCoProcessFunction<String, Purchase, Payment, Deal> {
+	public static class DealMatcher extends KeyedCoProcessFunction<String, Purchase, Payment, Deal> {
 
 		private static final long serialVersionUID = 13434343455656L;
-		private static final Logger log = LoggerFactory.getLogger(DealMaker.class);
+		private static final Logger log = LoggerFactory.getLogger(DealMatcher.class);
 		
 		private ValueState<Purchase> purchaseState = null;
 		private ValueState<Payment> paymentState = null;
-	
-		public DealMaker() {}
 	
 		@Override
 		public void open(Configuration config) {
@@ -133,7 +117,6 @@ public class MultiStreamJob {
 				purchaseState.update(purchase);
 				ctx.timerService().registerEventTimeTimer(purchase.getEventTime());
 			}
-	
 		}
 	
 		@Override
@@ -149,7 +132,7 @@ public class MultiStreamJob {
 			} else {
 				purchaseState.update(purchase);
 				ctx.timerService().registerEventTimeTimer(payment.getEventTime());
-			}        
+			}  
 		}
 	
 		@Override
