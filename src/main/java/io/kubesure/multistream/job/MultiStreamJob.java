@@ -48,7 +48,7 @@ public class MultiStreamJob {
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
 				.flatMap(new JSONToPurchase())
 				.assignTimestampsAndWatermarks
-					(new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(10)) {
+					(new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(5)) {
 						private static final long serialVersionUID = -686876346234753642L;	
 						@Override
 						public long extractTimestamp(Purchase element) {
@@ -63,7 +63,7 @@ public class MultiStreamJob {
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
 				.flatMap(new JSONToPayment())
 				.assignTimestampsAndWatermarks
-					(new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(10)) {
+					(new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(5)) {
 						private static final long serialVersionUID = -686876346234753642L;	
 						@Override
 						public long extractTimestamp(Payment element) {
@@ -154,20 +154,20 @@ public class MultiStreamJob {
 		private static final long serialVersionUID = -686876771747690202L;		
 
 		@Override
-		public void flatMap(String prospectCompany, Collector<Purchase> collector) {
+		public void flatMap(String purchase, Collector<Purchase> collector) {
 
 			KafkaProducer<String, String> producer = null;
 			ProducerRecord<String, String> producerRec = null;
 
 			try {
-				Purchase p = Convertor.convertToPurchase(prospectCompany);
+				Purchase p = Convertor.convertToPurchase(purchase);
 				collector.collect(p);
 			} catch (Exception e) {
-				log.error("Error deserialzing Prospect company", e);
+				log.error("Error deserialzing purchase", e);
 				producer = KafkaUtil.newKakfaProducer(parameterTool);
 				// TODO: Define new error message payload instead of dumping exception message on DLQ
 				producerRec = new ProducerRecord<String, String>
-										(parameterTool.getRequired("kafka.purchase.DQL.topic"), 
+										(parameterTool.getRequired("kafka.purchase.dql.topic"), 
 										e.getMessage());
 				// TODO: Implement async send
 				try {
@@ -195,14 +195,14 @@ public class MultiStreamJob {
 			ProducerRecord<String, String> producerRec = null;
 
 			try {
-				Payment p = new Payment();
+				Payment p = Convertor.convertToPayment(payment);
 				collector.collect(p);
 			} catch (Exception e) {
-				log.error("Error deserialzing Prospect company", e);
+				log.error("Error deserialzing payment", e);
 				producer = KafkaUtil.newKakfaProducer(parameterTool);
 				// TODO: Define new error message payload instead of dumping exception message on DLQ
 				producerRec = new ProducerRecord<String, String>
-										(parameterTool.getRequired("kafka.payment.DQL.topic"), 
+										(parameterTool.getRequired("kafka.purchase.dql.topic"), 
 										e.getMessage());
 				// TODO: Implement async send
 				try {
