@@ -10,7 +10,6 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.KeyedCoProcessFunction;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
@@ -22,9 +21,10 @@ import org.slf4j.LoggerFactory;
 import io.kubesure.multistream.datatypes.Deal;
 import io.kubesure.multistream.datatypes.Payment;
 import io.kubesure.multistream.datatypes.Purchase;
+import io.kubesure.multistream.sources.PaymentSource;
+import io.kubesure.multistream.sources.PurchaseSource;
 import io.kubesure.multistream.util.Convertor;
 import io.kubesure.multistream.util.KafkaUtil;
-import io.kubesure.multistream.util.TimeUtil;
 import io.kubesure.multistream.util.Util;
 
 public class MultiStreamJob {
@@ -43,8 +43,13 @@ public class MultiStreamJob {
 		parameterTool = Util.readProperties();
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+		
+		// Uncomment for testing.
+		DataStream<Purchase> purchaseInput = env.addSource(new PurchaseSource());
+		DataStream<Payment> paymentInput  = env.addSource(new PaymentSource());
 
-		DataStream<Purchase> purchaseInput = env
+		//Uncomment for Kafka Integration 
+		/*DataStream<Purchase> purchaseInput = env
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
 				.flatMap(new JSONToPurchase())
 				.assignTimestampsAndWatermarks
@@ -58,7 +63,7 @@ public class MultiStreamJob {
 							return element.getTransactionDate().getMillis();
 						}
 				}).name("Purchase Input");
-
+		
 		DataStream<Payment> paymentInput = env
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
 				.flatMap(new JSONToPayment())
@@ -72,20 +77,18 @@ public class MultiStreamJob {
 							}
 							return element.getTransactionDate().getMillis();
 						}
-				}).name("Payment Input");						
+				}).name("Payment Input");
+		*/								
 
 		SingleOutputStreamOperator<Deal> processed = purchaseInput
 						.connect(paymentInput)
 						.keyBy((Purchase::getTransactionDate),(Payment::getTransactionDate))
 						.process(new DealMatcher());		
 
-		processed.getSideOutput(unmatchedPayments).print();
-
+		processed.getSideOutput(unmatchedPurchases).print();
 		processed.getSideOutput(unmatchedPayments).print();
 						
 		processed.print(); 
-
-		
 
 		env.execute("Multistream Event Time Join");
 	}
@@ -97,6 +100,7 @@ public class MultiStreamJob {
 		
 		private ValueState<Purchase> purchaseState = null;
 		private ValueState<Payment> paymentState = null;
+		private long delay = Time.seconds(5).toMilliseconds();
 	
 		@Override
 		public void open(Configuration config) {

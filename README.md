@@ -50,7 +50,7 @@ Purchase - Initiated by any channel
 Transfer - Done by CBS
 
 ```
-{"transactionID": "EN123","clientId": "1232121","accountNumber": "1341232","status" : "success","referenceNumber": "E32e3e","transactionDate": "2020-06-07T00:55:10.258+04:00"}
+{"transactionID": "EN123","clientId": "1232121","accountNumber": "1341232", "amount": "989",  "status" : "success","referenceNumber": "E32e3e","transactionDate": "2020-06-07T00:55:10.258+04:00"}
 ```
 
 Deal - Purchase + Payment

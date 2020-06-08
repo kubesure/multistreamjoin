@@ -32,7 +32,6 @@ public class Deal implements Serializable{
         this.purchase = purchase;
     }
 
-
     public String toString(){
         return new StringBuilder()
         .append("Deal - ")

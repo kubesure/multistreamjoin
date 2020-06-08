@@ -16,17 +16,6 @@ public class Payment implements Event, Serializable {
     private Float amount;
     private String referenceNumber;
 
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Payment amount - ")
-          .append(amount)
-          .append(" from customer - ")
-          .append(clientID)
-          .append(" of amount - ")
-          .append(amount);
-        return sb.toString();
-    }
-
     public String getTransactionID() {
         return transactionID;
     }
@@ -85,5 +74,12 @@ public class Payment implements Event, Serializable {
 
     public long getEventTime(){
         return this.transactionDate.getMillis();
+    }
+
+    @Override
+    public String toString() {
+        return "Payment [account=" + account + ", amount=" + amount + ", clientID=" + clientID + ", referenceNumber="
+                + referenceNumber + ", status=" + status + ", transactionDate=" + transactionDate + ", transactionID="
+                + transactionID + "]";
     }
 }

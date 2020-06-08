@@ -111,4 +111,14 @@ public class Purchase implements Event, Serializable {
     public long getEventTime(){
         return this.transactionDate.getMillis();
     }
+
+    @Override
+    public String toString() {
+        return "Purchase [buySell=" + buySell + ", channel=" + channel + ", clientID=" + clientID + ", purchaseAmount="
+                + purchaseAmount + ", purchaseCurrency=" + purchaseCurrency + ", rate=" + rate + ", rateCode="
+                + rateCode + ", saleAmount=" + saleAmount + ", saleCurrency=" + saleCurrency + ", transactionDate="
+                + transactionDate + ", transactionID=" + transactionID + "]";
+    }
+
+    
 }
