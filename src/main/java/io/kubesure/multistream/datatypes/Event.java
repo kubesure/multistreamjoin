@@ -1,6 +1,8 @@
 package io.kubesure.multistream.datatypes;
 
-public interface Event {
+import java.io.Serializable;
+
+public interface Event extends Serializable{
     
     public long getEventTime();
 }

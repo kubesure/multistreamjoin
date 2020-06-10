@@ -31,27 +31,45 @@ public class PaymentSource extends RichParallelSourceFunction<Payment> {
     @Override
     public void run(SourceContext<Payment> ctx) throws Exception {
 
-        while(running) {
-            Payment p = newPayment();
-            ctx.emitWatermark(new Watermark(p.getTransactionDate().getMillis()));
-            ctx.collect(p);
-            Thread.sleep(delay);
-        }
+        // while(running) {
+            Payment p1 = newPayment("EN1");
+            ctx.emitWatermark(new Watermark(p1.getTransactionDate().getMillis()));
+            ctx.collect(p1);
 
-        if (runOnce) {
-            cancel();
-        }
-        
+            Thread.sleep(delay);
+
+            Payment p2 = newPayment("EN2");
+            ctx.emitWatermark(new Watermark(p2.getTransactionDate().getMillis()));
+            ctx.collect(p2);
+
+            Thread.sleep(delay);
+
+            Payment p3 = newPayment("EN3");
+            ctx.emitWatermark(new Watermark(p3.getTransactionDate().getMillis()));
+            ctx.collect(p3);
+
+            Thread.sleep(delay);
+
+            Payment p4 = newPayment("EN4");
+            ctx.emitWatermark(new Watermark(p4.getTransactionDate().getMillis()));
+            ctx.collect(p4);
+
+            Thread.sleep(delay);
+
+            //if (runOnce) {
+            //    cancel();
+            //}
+        //}
     }
 
-    private Payment newPayment() {
+    private Payment newPayment(String transactionID) {
         Payment p = new Payment();
         p.setAccount("122332");
         p.setAmount(989f);
         p.setClientID("234567");
         p.setReferenceNumber("E32e3e");
         p.setStatus("success");
-        p.setTransactionID("EN123");
+        p.setTransactionID(transactionID);
         p.setTransactionDate(new DateTime());
         return p;
     }

@@ -11,6 +11,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.KeyedCoProcessFunction;
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
@@ -22,10 +23,9 @@ import org.slf4j.LoggerFactory;
 import io.kubesure.multistream.datatypes.Deal;
 import io.kubesure.multistream.datatypes.Payment;
 import io.kubesure.multistream.datatypes.Purchase;
-import io.kubesure.multistream.sources.PaymentSource;
-import io.kubesure.multistream.sources.PurchaseSource;
 import io.kubesure.multistream.util.Convertor;
 import io.kubesure.multistream.util.KafkaUtil;
+import io.kubesure.multistream.util.TimeUtil;
 import io.kubesure.multistream.util.Util;
 
 public class MultiStreamJob {
@@ -45,35 +45,36 @@ public class MultiStreamJob {
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-		// Uncomment for testing.
-		DataStream<Purchase> purchaseInput = env.addSource(new PurchaseSource());
-		DataStream<Payment> paymentInput = env.addSource(new PaymentSource());
-
-		// Uncomment for Kafka Integration
-		/*
-		 * DataStream<Purchase> purchaseInput = env
-		 * .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic",
-		 * parameterTool)) .flatMap(new JSONToPurchase()) .assignTimestampsAndWatermarks
-		 * (new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(5)) {
-		 * private static final long serialVersionUID = -686876346234753642L;
-		 * 
-		 * @Override public long extractTimestamp(Purchase element) {
-		 * if(log.isInfoEnabled()) { log.info("New Event Time     - {}",
-		 * TimeUtil.ISOString(element.getTransactionDate().getMillis())); } return
-		 * element.getTransactionDate().getMillis(); } }).name("Purchase Input");
-		 * 
-		 * DataStream<Payment> paymentInput = env
-		 * .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic",
-		 * parameterTool)) .flatMap(new JSONToPayment()) .assignTimestampsAndWatermarks
-		 * (new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(5)) {
-		 * private static final long serialVersionUID = -686876346234753642L;
-		 * 
-		 * @Override public long extractTimestamp(Payment element) {
-		 * if(log.isInfoEnabled()) { log.info("New Event Time     - {}",
-		 * TimeUtil.ISOString(element.getTransactionDate().getMillis())); } return
-		 * element.getTransactionDate().getMillis(); } }).name("Payment Input");
-		 */
-
+		DataStream<Purchase> purchaseInput = env
+		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
+				.flatMap(new JSONToPurchase())
+				.assignTimestampsAndWatermarks
+					(new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(5)) {
+						private static final long serialVersionUID = -686876346234753642L;	
+						@Override
+						public long extractTimestamp(Purchase element) {
+							if(log.isInfoEnabled()) {
+								log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
+							}
+							return element.getTransactionDate().getMillis();
+						}
+				}).name("Purchase Input");
+		
+		DataStream<Payment> paymentInput = env
+		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
+				.flatMap(new JSONToPayment())
+				.assignTimestampsAndWatermarks
+					(new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(5)) {
+						private static final long serialVersionUID = -686876346234753642L;	
+						@Override
+						public long extractTimestamp(Payment element) {
+							if(log.isInfoEnabled()) {
+								log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
+							}
+							return element.getTransactionDate().getMillis();
+						}
+				}).name("Payment Input");
+		
 		SingleOutputStreamOperator<Deal> processed = purchaseInput.connect(paymentInput)
 				.keyBy((Purchase::getTransactionDate), (Payment::getTransactionDate)).process(new DealMatcher());
 

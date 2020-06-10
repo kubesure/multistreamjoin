@@ -14,13 +14,17 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
     private static final long serialVersionUID = -821842602548548856L;
     private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
 
-    boolean running = true;
-    boolean runOnce = false;
-    long delay = 500l;
+    private boolean running = true;
+    private boolean runOnce = false;
+    private long delay = 500l;
 
     public PurchaseSource(boolean runOnce, long withDelay) {
         this.runOnce = runOnce;
         this.delay = withDelay;
+    }
+
+    public PurchaseSource(boolean runOnce){
+        this.runOnce = runOnce;
     }
 
     public PurchaseSource(){}
@@ -28,20 +32,39 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
     @Override
     public void run(SourceContext<Purchase> ctx) throws Exception {
 
-        while(running) {
-            Purchase p = newPurchase();
-            ctx.emitWatermark(new Watermark(p.getTransactionDate().getMillis()));
-            ctx.collect(p);
+        //while(running) {
+            
+            Purchase p1 = newPurchase("EN1");
+            ctx.emitWatermark(new Watermark(p1.getTransactionDate().getMillis()));
+            ctx.collect(p1);
+
             Thread.sleep(delay);
-        }
 
-        if (runOnce) {
-            cancel();
-        }
+            Purchase p2 = newPurchase("EN2");
+            ctx.emitWatermark(new Watermark(p2.getTransactionDate().getMillis()));
+            ctx.collect(p2);
 
+            Thread.sleep(delay);
+
+            Purchase p3 = newPurchase("EN3");
+            ctx.emitWatermark(new Watermark(p3.getTransactionDate().getMillis()));
+            ctx.collect(p3);
+
+            Thread.sleep(delay);
+
+            Purchase p4 = newPurchase("EN4");
+            ctx.emitWatermark(new Watermark(p4.getTransactionDate().getMillis()));
+            ctx.collect(p4);
+
+            Thread.sleep(delay);
+
+            //if (runOnce) {
+                //cancel();
+            //}
+        //}
     }
 
-    private Purchase newPurchase() {
+    private Purchase newPurchase(String transactionID) {
         Purchase p = new Purchase();
         p.setBuySell("b");
         p.setChannel("online");
@@ -52,7 +75,7 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
         p.setRateCode("CUS");
         p.setSaleAmount("238");
         p.setSaleCurrency("EUR");
-        p.setTransactionID("EN123");
+        p.setTransactionID(transactionID);
         p.setTransactionDate(new DateTime());
         return p;
     }

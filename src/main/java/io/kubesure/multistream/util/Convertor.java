@@ -27,6 +27,18 @@ public class Convertor {
     }
 
     // TODO: Create a generic based method to serialize
+    public static String convertPurchaseToJson(Purchase purchase) throws Exception{
+        String p = newGson().toJson(purchase, Purchase.class);
+        return p;
+    }
+
+    // TODO: Create a generic based method to serialize
+    public static String convertPaymentToJson(Payment payment) throws Exception{
+        String p = newGson().toJson(payment,Payment.class);
+        return p;
+    }
+
+    // TODO: Create a generic based method to serialize
     public static Purchase convertToPurchase(String purchase) throws Exception{
         Purchase p = newGson().fromJson(purchase, Purchase.class);
         return p;
