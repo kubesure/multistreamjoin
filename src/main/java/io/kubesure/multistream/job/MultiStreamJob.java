@@ -3,6 +3,7 @@ package io.kubesure.multistream.job;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
@@ -33,62 +34,53 @@ public class MultiStreamJob {
 	public static ParameterTool parameterTool;
 
 	static final OutputTag<Purchase> unmatchedPurchases = new OutputTag<Purchase>("unmatchedPurchases") {
-        private static final long serialVersionUID = 13434343455656L;
-    };
+		private static final long serialVersionUID = 13434343455656L;
+	};
 	static final OutputTag<Payment> unmatchedPayments = new OutputTag<Payment>("unmatchedPayments") {
-        private static final long serialVersionUID = 13434343455656L;
-    };
-	
+		private static final long serialVersionUID = 13434343455656L;
+	};
+
 	public static void main(String[] args) throws Exception {
 		parameterTool = Util.readProperties();
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-		
+
 		// Uncomment for testing.
 		DataStream<Purchase> purchaseInput = env.addSource(new PurchaseSource());
-		DataStream<Payment> paymentInput  = env.addSource(new PaymentSource());
+		DataStream<Payment> paymentInput = env.addSource(new PaymentSource());
 
-		//Uncomment for Kafka Integration 
-		/*DataStream<Purchase> purchaseInput = env
-		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
-				.flatMap(new JSONToPurchase())
-				.assignTimestampsAndWatermarks
-					(new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(5)) {
-						private static final long serialVersionUID = -686876346234753642L;	
-						@Override
-						public long extractTimestamp(Purchase element) {
-							if(log.isInfoEnabled()) {
-								log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
-							}
-							return element.getTransactionDate().getMillis();
-						}
-				}).name("Purchase Input");
-		
-		DataStream<Payment> paymentInput = env
-		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
-				.flatMap(new JSONToPayment())
-				.assignTimestampsAndWatermarks
-					(new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(5)) {
-						private static final long serialVersionUID = -686876346234753642L;	
-						@Override
-						public long extractTimestamp(Payment element) {
-							if(log.isInfoEnabled()) {
-								log.info("New Event Time     - {}", TimeUtil.ISOString(element.getTransactionDate().getMillis()));	
-							}
-							return element.getTransactionDate().getMillis();
-						}
-				}).name("Payment Input");
-		*/								
+		// Uncomment for Kafka Integration
+		/*
+		 * DataStream<Purchase> purchaseInput = env
+		 * .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic",
+		 * parameterTool)) .flatMap(new JSONToPurchase()) .assignTimestampsAndWatermarks
+		 * (new BoundedOutOfOrdernessTimestampExtractor<Purchase>(Time.seconds(5)) {
+		 * private static final long serialVersionUID = -686876346234753642L;
+		 * 
+		 * @Override public long extractTimestamp(Purchase element) {
+		 * if(log.isInfoEnabled()) { log.info("New Event Time     - {}",
+		 * TimeUtil.ISOString(element.getTransactionDate().getMillis())); } return
+		 * element.getTransactionDate().getMillis(); } }).name("Purchase Input");
+		 * 
+		 * DataStream<Payment> paymentInput = env
+		 * .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic",
+		 * parameterTool)) .flatMap(new JSONToPayment()) .assignTimestampsAndWatermarks
+		 * (new BoundedOutOfOrdernessTimestampExtractor<Payment>(Time.seconds(5)) {
+		 * private static final long serialVersionUID = -686876346234753642L;
+		 * 
+		 * @Override public long extractTimestamp(Payment element) {
+		 * if(log.isInfoEnabled()) { log.info("New Event Time     - {}",
+		 * TimeUtil.ISOString(element.getTransactionDate().getMillis())); } return
+		 * element.getTransactionDate().getMillis(); } }).name("Payment Input");
+		 */
 
-		SingleOutputStreamOperator<Deal> processed = purchaseInput
-						.connect(paymentInput)
-						.keyBy((Purchase::getTransactionDate),(Payment::getTransactionDate))
-						.process(new DealMatcher());		
+		SingleOutputStreamOperator<Deal> processed = purchaseInput.connect(paymentInput)
+				.keyBy((Purchase::getTransactionDate), (Payment::getTransactionDate)).process(new DealMatcher());
 
 		processed.getSideOutput(unmatchedPurchases).print();
 		processed.getSideOutput(unmatchedPayments).print();
-						
-		processed.print(); 
+
+		processed.print();
 
 		env.execute("Multistream Event Time Join");
 	}
@@ -97,48 +89,54 @@ public class MultiStreamJob {
 
 		private static final long serialVersionUID = 13434343455656L;
 		private static final Logger log = LoggerFactory.getLogger(DealMatcher.class);
-		
+
 		private ValueState<Purchase> purchaseState = null;
 		private ValueState<Payment> paymentState = null;
-		private long delay = Time.seconds(5).toMilliseconds();
-	
+		private long FIVE_SECONDS = Time.seconds(5).toMilliseconds();
+		private transient ValueState<Long> timerState;
+
 		@Override
 		public void open(Configuration config) {
 			purchaseState = getRuntimeContext().getState(new ValueStateDescriptor<>("saved purchase", Purchase.class));
 			paymentState = getRuntimeContext().getState(new ValueStateDescriptor<>("saved payment", Payment.class));
+			timerState = getRuntimeContext().getState(new ValueStateDescriptor<>("timer state", Types.LONG));
 		}
-	
+
 		@Override
-		public void processElement1(Purchase purchase, 
-									KeyedCoProcessFunction<String, Purchase, Payment,Deal>.Context ctx,
-									Collector<Deal> out) throws Exception {
+		public void processElement1(Purchase purchase,
+				KeyedCoProcessFunction<String, Purchase, Payment, Deal>.Context ctx, Collector<Deal> out)
+				throws Exception {
 			Payment payment = paymentState.value();
 			if (payment != null) {
 				paymentState.clear();
-				ctx.timerService().deleteEventTimeTimer(payment.getEventTime());
-				out.collect(new Deal(purchase,payment));
+				ctx.timerService().deleteEventTimeTimer(timerState.value());
+				out.collect(new Deal(purchase, payment));
 			} else {
 				purchaseState.update(purchase);
-				ctx.timerService().registerEventTimeTimer(purchase.getEventTime());
+				long delay = purchase.getEventTime() + FIVE_SECONDS;
+				timerState.update(delay);
+				ctx.timerService().registerEventTimeTimer(delay);
 			}
 		}
-	
+
 		@Override
-		public void processElement2(Payment payment, 
-									KeyedCoProcessFunction<String, Purchase, Payment, Deal>.Context ctx,
-									Collector<Deal> out) throws Exception {
-	
+		public void processElement2(Payment payment,
+				KeyedCoProcessFunction<String, Purchase, Payment, Deal>.Context ctx, Collector<Deal> out)
+				throws Exception {
+
 			Purchase purchase = purchaseState.value();
 			if (purchase != null) {
 				purchaseState.clear();
-				ctx.timerService().deleteEventTimeTimer(purchase.getEventTime());
-				out.collect(new Deal(purchase,payment));
+				ctx.timerService().deleteEventTimeTimer(timerState.value());
+				out.collect(new Deal(purchase, payment));
 			} else {
-				purchaseState.update(purchase);
-				ctx.timerService().registerEventTimeTimer(payment.getEventTime());
-			}  
+				paymentState.update(payment);
+				long delay = payment.getEventTime() + FIVE_SECONDS;
+				timerState.update(delay);
+				ctx.timerService().registerEventTimeTimer(delay);
+			}
 		}
-	
+
 		@Override
 		public void onTimer(long t, OnTimerContext ctx, Collector<Deal> out) throws Exception {
 			if (purchaseState.value() != null) {
@@ -148,7 +146,7 @@ public class MultiStreamJob {
 			if (paymentState.value() != null) {
 				ctx.output(unmatchedPayments, paymentState.value());
 				paymentState.clear();
-			}        
+			}
 		}
 	}
 

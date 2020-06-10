@@ -31,6 +31,20 @@ public class PaymentSource extends RichParallelSourceFunction<Payment> {
     @Override
     public void run(SourceContext<Payment> ctx) throws Exception {
 
+        while(running) {
+            Payment p = newPayment();
+            ctx.emitWatermark(new Watermark(p.getTransactionDate().getMillis()));
+            ctx.collect(p);
+            Thread.sleep(delay);
+        }
+
+        if (runOnce) {
+            cancel();
+        }
+        
+    }
+
+    private Payment newPayment() {
         Payment p = new Payment();
         p.setAccount("122332");
         p.setAmount(989f);
@@ -39,17 +53,7 @@ public class PaymentSource extends RichParallelSourceFunction<Payment> {
         p.setStatus("success");
         p.setTransactionID("EN123");
         p.setTransactionDate(new DateTime());
-        ctx.collect(p);
-        ctx.emitWatermark(new Watermark(p.getTransactionDate().getMillis()));
-
-        while(running) {
-            Thread.sleep(delay);
-        }
-
-        if (runOnce) {
-            cancel();
-        }
-        
+        return p;
     }
 
     @Override

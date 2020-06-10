@@ -28,6 +28,20 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
     @Override
     public void run(SourceContext<Purchase> ctx) throws Exception {
 
+        while(running) {
+            Purchase p = newPurchase();
+            ctx.emitWatermark(new Watermark(p.getTransactionDate().getMillis()));
+            ctx.collect(p);
+            Thread.sleep(delay);
+        }
+
+        if (runOnce) {
+            cancel();
+        }
+
+    }
+
+    private Purchase newPurchase() {
         Purchase p = new Purchase();
         p.setBuySell("b");
         p.setChannel("online");
@@ -40,17 +54,7 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
         p.setSaleCurrency("EUR");
         p.setTransactionID("EN123");
         p.setTransactionDate(new DateTime());
-        ctx.collect(p);
-        ctx.emitWatermark(new Watermark(p.getTransactionDate().getMillis()));
-        
-        while(running) {
-            Thread.sleep(delay);
-        }
-
-        if (runOnce) {
-            cancel();
-        }
-
+        return p;
     }
 
     @Override
