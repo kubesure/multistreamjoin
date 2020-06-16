@@ -2,6 +2,7 @@ package io.kubesure.multistream.util;
 
 import java.lang.reflect.Type;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -18,42 +19,28 @@ import io.kubesure.multistream.datatypes.Deal;
 import io.kubesure.multistream.datatypes.Payment;
 import io.kubesure.multistream.datatypes.Purchase;
 
-public class Convertor {
+public class JsonEventSerializer<T> {
 
-       
-    // TODO: Create a generic based method to serialize
-    public static Payment convertToPayment(String payment) throws Exception{
-        Payment p = newGson().fromJson(payment, Payment.class);
-        return p;
+
+    public <T> T toType(String json, Class<T> tt) throws Exception{
+        Type type = new TypeToken<Class<T>>(){}.getType();
+        Object o = tt.getConstructor(tt).newInstance(tt.getName());
+        return new GsonBuilder().registerTypeAdapter(type, o).create().fromJson(json, type);
+        //newGson().fromJson(json, tt.isInstance(tt);
     }
 
-    // TODO: Create a generic based method to serialize
-    public static String convertPurchaseToJson(Purchase purchase) throws Exception{
-        String p = newGson().toJson(purchase, Purchase.class);
-        return p;
+    public <T> String toString(T object,Class<T> tt) throws Exception{
+        Type type = new TypeToken<Class<T>>(){}.getType();
+        Object o = tt.getConstructor(tt).newInstance(tt.getName());
+        return new GsonBuilder().registerTypeAdapter(type, o).create().toJson(o, type);
     }
 
-    // TODO: Create a generic based method to serialize
-    public static String convertPaymentToJson(Payment payment) throws Exception{
-        String p = newGson().toJson(payment,Payment.class);
-        return p;
-    }
-
-    // TODO: Create a generic based method to serialize
-    public static String convertDealToJson(Deal deal) throws Exception{
-        String d = newGson().toJson(deal,Deal.class);
-        return d;
-    }
-
-    // TODO: Create a generic based method to serialize
-    public static Purchase convertToPurchase(String purchase) throws Exception{
-        Purchase p = newGson().fromJson(purchase, Purchase.class);
-        return p;
-    }
-
-    private static Gson newGson() {
+    private Gson newGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeTypeConverter());
+        gsonBuilder.registerTypeAdapter(Payment.class, new Payment());
+        gsonBuilder.registerTypeAdapter(Purchase.class, new Purchase());
+        gsonBuilder.registerTypeAdapter(Deal.class, new Deal());
         Gson gson = gsonBuilder.create();
         return gson;
     }
@@ -71,4 +58,5 @@ public class Convertor {
             return eventTime;
         }
     }
+    
 }

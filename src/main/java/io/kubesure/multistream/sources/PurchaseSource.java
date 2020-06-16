@@ -1,6 +1,7 @@
 package io.kubesure.multistream.sources;
 
-import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -8,23 +9,25 @@ import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Purchase;
 
-public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
+public class PurchaseSource implements SourceFunction<Purchase> {
 
    
     private static final long serialVersionUID = -821842602548548856L;
     private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
 
-    private boolean running = true;
-    private boolean runOnce = false;
-    private long delay = 500l;
+    private long withDelay = 500l;
+    private int produce;
+    private long transactionID = 1;
 
-    public PurchaseSource(boolean runOnce, long withDelay) {
-        this.runOnce = runOnce;
-        this.delay = withDelay;
+    public PurchaseSource(int produce, int transactionStartID, long withDelay){
+        this.produce = produce;
+        this.withDelay = withDelay;
+        this.transactionID = transactionStartID;
     }
 
-    public PurchaseSource(boolean runOnce){
-        this.runOnce = runOnce;
+    public PurchaseSource(int produce, long withDelay){
+        this.produce = produce;
+        this.withDelay = withDelay;
     }
 
     public PurchaseSource(){}
@@ -32,36 +35,13 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
     @Override
     public void run(SourceContext<Purchase> ctx) throws Exception {
 
-        //while(running) {
-            
-            Purchase p1 = newPurchase("EN1");
+        while(produce != 0) {
+            Purchase p1 = newPurchase("EN" + transactionID++);
             ctx.emitWatermark(new Watermark(p1.getTransactionDate().getMillis()));
             ctx.collect(p1);
-
-            Thread.sleep(delay);
-
-            Purchase p2 = newPurchase("EN2");
-            ctx.emitWatermark(new Watermark(p2.getTransactionDate().getMillis()));
-            ctx.collect(p2);
-
-            Thread.sleep(delay);
-
-            Purchase p3 = newPurchase("EN3");
-            ctx.emitWatermark(new Watermark(p3.getTransactionDate().getMillis()));
-            ctx.collect(p3);
-
-            Thread.sleep(delay);
-
-            Purchase p4 = newPurchase("EN4");
-            ctx.emitWatermark(new Watermark(p4.getTransactionDate().getMillis()));
-            ctx.collect(p4);
-
-            Thread.sleep(delay);
-
-            //if (runOnce) {
-                //cancel();
-            //}
-        //}
+            Thread.sleep(withDelay);
+            --produce;
+        }
     }
 
     private Purchase newPurchase(String transactionID) {
@@ -82,7 +62,7 @@ public class PurchaseSource extends RichParallelSourceFunction<Purchase> {
 
     @Override
     public void cancel() {
-        running = false;    
+        produce = 0;
     }
 
 }

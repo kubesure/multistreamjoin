@@ -1,11 +1,12 @@
 package io.kubesure.multistream.datatypes;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
-public class Purchase implements Event {
+public class Purchase implements Serializable {
    
-    private static final long serialVersionUID = 7828263604923548699L;
-    
+    private static final long serialVersionUID = 801356870774628145L;
     private String transactionID;
     private DateTime transactionDate;
     private String purchaseCurrency;
@@ -17,6 +18,8 @@ public class Purchase implements Event {
     private String buySell;
     private String clientID;
     private String channel;
+
+    public Purchase(){}
 
     public String getTransactionID() {
         return transactionID;

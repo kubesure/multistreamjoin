@@ -1,8 +1,10 @@
 package io.kubesure.multistream.datatypes;
 
+import java.io.Serializable;
+
 import io.kubesure.multistream.util.TimeUtil;
 
-public class Deal implements Event {
+public class Deal implements Serializable {
    
     private static final long serialVersionUID = 4694386434588446195L;
     
@@ -42,7 +44,6 @@ public class Deal implements Event {
         .append(payment.getStatus()).toString();
     }
 
-    @Override
     public long getEventTime() {
         return payment.getEventTime();
     }

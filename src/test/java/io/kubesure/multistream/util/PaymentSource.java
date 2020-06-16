@@ -11,23 +11,34 @@ public class PaymentSource extends CommonThread implements Runnable {
     private boolean running = true;
     private long transactionID = 1;
     private int produce; 
+    private long INTERVAL_TIME = 3000l;
     private static final Logger log = LoggerFactory.getLogger(PaymentSource.class);
 
-    public PaymentSource(){}
-
-    public PaymentSource(int produce){
+    public PaymentSource(int produce,long withDelay){
         this.produce = produce;
+        this.INTERVAL_TIME = withDelay;
+    }
+
+    public PaymentSource(int produce,int transactionStartID,long withDelay){
+        this.produce = produce;
+        this.INTERVAL_TIME = withDelay;
+        this.transactionID = transactionStartID;
     }
 
     @Override
     public void run() {
-        while(running) {
+        while(running && produce !=0) {
             try {
                 Payment payment = newPayment("EN" + transactionID++);
                 send(Convertor.convertPaymentToJson(payment), "payment");
-            } catch (Exception e) {
+                Thread.sleep(INTERVAL_TIME);
+            } catch (InterruptedException txp) {
+                log.error("Error sleeping thread", txp);  
+            }   
+            catch (Exception e) {
                 log.error("Error sending payment to kafka", e);
             }
+            --produce;
         }
     }
 
@@ -42,5 +53,4 @@ public class PaymentSource extends CommonThread implements Runnable {
         p.setTransactionDate(new DateTime());
         return p;
     }
-    
 }

@@ -11,23 +11,33 @@ public class PurchaseSource extends CommonThread implements Runnable {
     private boolean running = true;
     private long transactionID = 1;
     private int produce; 
+    private long INTERVAL_TIME = 3000l;
     private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
 
-    public PurchaseSource(){}
-
-    public PurchaseSource(int produce){
+    public PurchaseSource(int produce, int transactionStartID, long withDelay){
         this.produce = produce;
+        this.INTERVAL_TIME = withDelay;
+        this.transactionID = transactionStartID;
+    }
+
+    public PurchaseSource(int produce, long withDelay){
+        this.produce = produce;
+        this.INTERVAL_TIME = withDelay;
     }
 
     @Override
     public void run() {
-        while(running) {
+        while(running && produce != 0) {
             try {
                 Purchase purchase = newPurchase("EN" + transactionID++);
                 send(Convertor.convertPurchaseToJson(purchase), "purchase");
+                Thread.sleep(INTERVAL_TIME);
+            } catch (InterruptedException txp) {
+                log.error("Error sleeping thread", txp);    
             } catch (Exception e) {
                 log.error("Error sending to kafka", e);
             }
+            --produce;
         }
     }
 
@@ -46,5 +56,4 @@ public class PurchaseSource extends CommonThread implements Runnable {
         p.setTransactionDate(new DateTime());
         return p;
     }
-    
 }

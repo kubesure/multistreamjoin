@@ -1,6 +1,6 @@
 package io.kubesure.multistream.sources;
 
-import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
+import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -8,58 +8,36 @@ import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Payment;
 
-public class PaymentSource extends RichParallelSourceFunction<Payment> {
+public class PaymentSource implements SourceFunction<Payment> {
 
     private static final long serialVersionUID = 6910755227184782112L;
     private static final Logger log = LoggerFactory.getLogger(PaymentSource.class);
 
-    private boolean running = true;
-    private boolean runOnce = false;
-    private long delay = 500l;
+    private long withDelay = 500l;
+    private long transactionID = 1;
+    private int produce;
 
-    public PaymentSource(boolean runOnce){
-        this.runOnce = runOnce;
+    public PaymentSource(int produce,long withDelay){
+        this.produce = produce;
+        this.withDelay = withDelay;
     }
 
-    public PaymentSource(boolean runOnce, long withDelay){
-        this.runOnce = runOnce;
-        this.delay = withDelay;
+    public PaymentSource(int produce,int transactionStartID,long withDelay){
+        this.produce = produce;
+        this.withDelay = withDelay;
+        this.transactionID = transactionStartID;
     }
-
-    public PaymentSource(){}
 
     @Override
     public void run(SourceContext<Payment> ctx) throws Exception {
 
-        // while(running) {
-            Payment p1 = newPayment("EN1");
+        while(produce !=0) {
+            Payment p1 = newPayment("EN" + transactionID++);
             ctx.emitWatermark(new Watermark(p1.getTransactionDate().getMillis()));
             ctx.collect(p1);
-
-            Thread.sleep(delay);
-
-            Payment p2 = newPayment("EN2");
-            ctx.emitWatermark(new Watermark(p2.getTransactionDate().getMillis()));
-            ctx.collect(p2);
-
-            Thread.sleep(delay);
-
-            Payment p3 = newPayment("EN3");
-            ctx.emitWatermark(new Watermark(p3.getTransactionDate().getMillis()));
-            ctx.collect(p3);
-
-            Thread.sleep(delay);
-
-            Payment p4 = newPayment("EN4");
-            ctx.emitWatermark(new Watermark(p4.getTransactionDate().getMillis()));
-            ctx.collect(p4);
-
-            Thread.sleep(delay);
-
-            //if (runOnce) {
-            //    cancel();
-            //}
-        //}
+            Thread.sleep(withDelay);
+            --produce;
+        }
     }
 
     private Payment newPayment(String transactionID) {
@@ -76,7 +54,6 @@ public class PaymentSource extends RichParallelSourceFunction<Payment> {
 
     @Override
     public void cancel() {
-        running = false;
+        produce = 0;
     }
-    
 }
