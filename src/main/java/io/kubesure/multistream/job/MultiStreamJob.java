@@ -23,12 +23,18 @@ import org.slf4j.LoggerFactory;
 import io.kubesure.multistream.datatypes.Deal;
 import io.kubesure.multistream.datatypes.Payment;
 import io.kubesure.multistream.datatypes.Purchase;
-import io.kubesure.multistream.sources.PaymentSource;
-import io.kubesure.multistream.sources.PurchaseSource;
 import io.kubesure.multistream.util.Convertor;
-import io.kubesure.multistream.util.JsonEventSerializer;
 import io.kubesure.multistream.util.KafkaUtil;
 import io.kubesure.multistream.util.Util;
+
+/**
+ * @author Prashant Patel
+ * MultiStreamJob connects two stream Purchase and Payment to match a Deal. The {@code DealMatcher} matches 
+ * {@link Purchase} to {@link Payment} on tranaction id. The match waits for each deal to arrive for a 
+ * timer.delay.time. Events arriving later than timer.delay.time will processed to late events Topic 
+ * kafka.purchase.unmatched.topic and kafka.payment.unmatched.topic for re-processsing by a pipleline. The 
+ * events can be push in MultiStreamJob from a re-processing pipeline based on retries.    
+ */
 
 public class MultiStreamJob {
 
