@@ -1,5 +1,57 @@
 # multistreamjoin
-Multistream Join - Flink
+Multistream Join Job - Connects stream currecny Purchase with Payment and Match a Deal by tranaction of both events. Late / unmatched event is pushed to late arrived topics. See code documentation for better understanding for match working.  
+
+
+## Purchase 
+```
+{
+  "transactionID": "EN123",
+  "clientId": "1232121",
+  "channel": "online",
+  "purchaseCurrency": "AED",
+  "saleCurrency": "EUR",
+  "purchaseAmount": "989",
+  "saleAmount": "238",
+  "rate": "4.16",
+  "rateCode": "CUS",
+  "buysell": "b",
+  "transactionDate": "2020-06-07T00:55:01.258+04:00"
+}
+```
+
+## Payment
+
+```
+{
+  "transactionID": "EN123",
+  "clientId": "1232121",
+  "accountNumber": "1341232",
+  "amount": "989",
+  "status": "success",
+  "referenceNumber": "E32e3e",
+  "transactionDate": "2020-06-07T00:55:10.258+04:00"
+}
+```
+
+## Deal - Purchase + Payment
+
+```
+{
+    "transactionID": "EN123",
+    "transactionDate": "2019-12-T12:12:22"
+    "channel": "online",
+    "cif": "1232121"
+    "saleCurrency": "EUR",
+    "purchaseCurrency": "AED",
+    "saleAmount": "238"
+    "purchaseAmount": "989",
+    "rate": "4.16",
+    "rateCode": "CUS"
+    "buysell": "b",
+    "status" : "success"
+    "referenceNumber" : "E32e3e"
+}
+```
 
 ## Create topics
 
@@ -22,14 +74,7 @@ kafka-topics --create --bootstrap-server localhost:9092 --partitions 1 --replica
 
 ```
 
-## Push events for matching
-
-```
-kafka-console-producer --broker-list localhost:9092 --topic purchase
-
-kafka-console-producer --broker-list localhost:9092 --topic payment
-```
-
+## Consume events 
 
 ```
 
@@ -41,34 +86,15 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic payment-dql
 
 ```
 
-Purchase - Initiated by any channel
+## Push events for testing matches
 
 ```
-{"transactionID": "EN123","clientId": "1232121","channel": "online","purchaseCurrency": "AED","saleCurrency": "EUR","purchaseAmount": "989","saleAmount": "238","rate":"4.16","rateCode": "CUS","buysell": "b","transactionDate": "2020-06-07T00:55:01.258+04:00"}
-```
 
-Transfer - Done by CBS
+mvn clean package
 
-```
-{"transactionID": "EN123","clientId": "1232121","accountNumber": "1341232", "amount": "989",  "status" : "success","referenceNumber": "E32e3e","transactionDate": "2020-06-07T00:55:10.258+04:00"}
-```
+/opt/fink/start-cluster.sh
 
-Deal - Purchase + Payment
+/opt/flink/flink run target/singlestream-aggregates-0.1.jar &
 
-```
-{
-    "transactionID": "EN123",
-    "transactionDate": "2019-12-T12:12:22"
-    "channel": "online",
-    "cif": "1232121"
-    "saleCurrency": "EUR",
-    "purchaseCurrency": "AED",
-    "saleAmount": "238"
-    "purchaseAmount": "989",
-    "rate": "4.16",
-    "rateCode": "CUS"
-    "buysell": "b",
-    "status" : "success"
-    "referenceNumber" : "E32e3e"
-}
+Execute io.kubesure.multistream.TestDealMatcher in IDE 
 ```
