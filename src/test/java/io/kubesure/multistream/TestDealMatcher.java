@@ -1,4 +1,4 @@
-package io.kubesure.multistream.util;
+package io.kubesure.multistream;
 
 public class TestDealMatcher {
 

@@ -1,4 +1,4 @@
-package io.kubesure.multistream;
+package io.kubesure.multistream.util;
 
 import io.kubesure.multistream.datatypes.Purchase;
 import io.kubesure.multistream.util.JsonEventSerializer;
