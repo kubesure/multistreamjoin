@@ -68,13 +68,13 @@ public class MultiStreamJob {
 				.name("Purchase Input");
 		
 		// Comment for unit testing		
-		//Read from purchase Topic and Map to Payment
+		//Read from payment Topic and Map to Payment
 		DataStream<Payment> paymentInput = env
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
 				.flatMap(new JSONToPayment())
 				.name("Payment Input");
 
-		//Connect purchase to payment, keyby transaction id and match payment to purchase to match a deal.		
+		//Connect purchase to payment, keyby transaction id and match payment to purchase for a deal.		
 		SingleOutputStreamOperator<Deal> processed = purchaseInput
 				.connect(paymentInput)
 				.keyBy((Purchase::getTransactionID), (Payment::getTransactionID))
@@ -89,8 +89,8 @@ public class MultiStreamJob {
 		//Push matched deal to deal topic
 		processed.map(new MapToDealJSON())
 				 .addSink(KafkaUtil.newFlinkKafkaProducer
-									(parameterTool.getRequired("kafka.deal.topic"),
-				   				     parameterTool))
+							(parameterTool.getRequired("kafka.deal.topic"),
+				   			parameterTool))
 				 .name("Deal");
 
 		//Push late or unmatched purchase w.r.t to payment which came later than timer.delay.time   		 
@@ -98,24 +98,24 @@ public class MultiStreamJob {
 				.getSideOutput(unmatchedPurchases)
 				.map(new MapToPurchaseJSON())
 				.addSink(KafkaUtil.newFlinkKafkaProducer
-									(parameterTool.getRequired("kafka.purchase.unmatched.topic"),
-							  		 parameterTool))
-				.name("UnMatched purchase");
+							(parameterTool.getRequired("kafka.purchase.unmatched.topic"),
+							parameterTool))
+				.name("UnMatched purchases");
 							
 		//Push late or unmatched payment w.r.t to purchase which came later than timer.delay.time		
 		processed
 				.getSideOutput(unmatchedPayments)
 				.map(new MapToPaymentJSON())
 				.addSink(KafkaUtil.newFlinkKafkaProducer
-									(parameterTool.getRequired("kafka.payment.unmatched.topic"),
-									 parameterTool))
+							(parameterTool.getRequired("kafka.payment.unmatched.topic"),
+						  	 parameterTool))
 				.name("UnMatched payments");					
 
 		env.execute("Multistream Event Time Join");
 	}
 
 	/**
-	 * The connected transactionid keyedby matcher, matches purchase to a payment late events are 
+	 * The connected transactionid keyedby matcher, matches purchase to a payment, late events are 
 	 * caught in ontimer after timer.delay.time. Works with both event time and processsing time. 
 	 */
 	public static class DealMatcher extends KeyedCoProcessFunction<String, Purchase, Payment, Deal> {
@@ -143,15 +143,18 @@ public class MultiStreamJob {
 		public void processElement1(Purchase purchase,
 				KeyedCoProcessFunction<String, Purchase, Payment, Deal>.Context ctx, Collector<Deal> out)
 				throws Exception {
-			//Check if payment for purchase has already arrived and stored in payment valuestate		
+			//Check if payment for purchase has already arrived 
+			// if yes match is a sucessfull deal 
+			// if no store purchase for matching when payment arrives
 			Payment payment = paymentState.value();
 			if (payment != null) {
-				// if payment arrived match the deal and push out for sink
+				// if payment arrived match the deal and push out to sink
 				Deal d = new Deal(purchase, payment);
 				cleanUp(ctx);
 				out.collect(d);
 			} else {
-				// if payment has not arrived store in purchase state for processelement2 to match when payment arrives
+				// if payment has not arrived store in purchase state for processelement2 
+				//to match when payment arrives
 				purchaseState.update(purchase);	
 
 				//set timer with a timer.delay.time
@@ -173,7 +176,9 @@ public class MultiStreamJob {
 				KeyedCoProcessFunction<String, Purchase, Payment, Deal>.Context ctx, Collector<Deal> out)
 				throws Exception {
 
-			//Check if purchase for payment has already arrived and stored in purchase valuestate
+			// Check if purchase for payment has already arrived 
+			// if yes match is a sucessfull deal 
+			// if no store payment for matching when purchase arrives
 			Purchase purchase = purchaseState.value();
 			if (purchase != null) {
 				// if purchase arrived match the deal and push out for sink
@@ -181,7 +186,8 @@ public class MultiStreamJob {
 				cleanUp(ctx);
 				out.collect(d);
 			} else {
-				//if purchase has not arrived store in payment state for processelement1 to match when purchase arrives
+				//if purchase has not arrived store in payment state for processelement1 to 
+				//match when purchase arrives
 				paymentState.update(payment);
 
 				//set timer with a timer.delay.time
@@ -197,6 +203,9 @@ public class MultiStreamJob {
 			}
 		}
 
+		/**
+		 * Called on timer expiry. Late events or ummatched event is push to side output.  
+		 */
 		@Override
 		public void onTimer(long t, OnTimerContext ctx, Collector<Deal> out) throws Exception {
 
@@ -206,13 +215,13 @@ public class MultiStreamJob {
 			boolean hasPurchaseArrived = purchase != null;
 			boolean hasPaymentArrived  = payment != null;
 
-			//push unmatch or late arrived purchase to sideout > kafka.purchase.unmatched.topic
+			//push unmatch or late arrived purchase to sideoutput > kafka.purchase.unmatched.topic
 			if ((hasPurchaseArrived && !hasPaymentArrived)) {
 				ctx.output(unmatchedPurchases, purchaseState.value());
 				cleanUp(ctx);
 			}
 
-			//push unmatch or late arrived purchase to sideout > kafka.payment.unmatched.topic
+			//push unmatch or late arrived purchase to sideoutput > kafka.payment.unmatched.topic
 			if ((!hasPurchaseArrived && hasPaymentArrived)) {
 				ctx.output(unmatchedPayments, paymentState.value());
 				cleanUp(ctx);
@@ -355,8 +364,7 @@ public class MultiStreamJob {
 	}
 
 	/**
-	 * Map matched purchase to payment Deal to string for push to sink 
-	 * on topic kafka.deal.topic=deal 
+	 * Map matched purchase to payment Deals to string for push in sink topic kafka.deal.topic
 	 * TODO: Requires a generic template to avoid repeating code
 	 */
 	private static class MapToDealJSON implements MapFunction<Deal,String> {
