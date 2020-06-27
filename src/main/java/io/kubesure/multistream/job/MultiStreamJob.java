@@ -65,20 +65,21 @@ public class MultiStreamJob {
 		DataStream<Purchase> purchaseInput = env
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
 				.flatMap(new JSONToPurchase())
-				.name("Purchase Input");
+				.uid("Purchase Input");
 		
 		// Comment for unit testing		
 		//Read from payment Topic and Map to Payment
 		DataStream<Payment> paymentInput = env
 		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
 				.flatMap(new JSONToPayment())
-				.name("Payment Input");
+				.uid("Payment Input");
 
 		//Connect purchase to payment, keyby transaction id and match payment to purchase for a deal.		
 		SingleOutputStreamOperator<Deal> processed = purchaseInput
 				.connect(paymentInput)
 				.keyBy((Purchase::getTransactionID), (Payment::getTransactionID))
-				.process(new DealMatcher(parameterTool.getLong("timer.delay.time")));
+				.process(new DealMatcher(parameterTool.getLong("timer.delay.time")))
+				.uid("Match Deal");
 
 		if (log.isInfoEnabled()) {
 			processed.getSideOutput(unmatchedPurchases).print();
@@ -91,7 +92,7 @@ public class MultiStreamJob {
 				 .addSink(KafkaUtil.newFlinkKafkaProducer
 							(parameterTool.getRequired("kafka.deal.topic"),
 				   			parameterTool))
-				 .name("Deal");
+				 .uid("Deal");
 
 		//Push late or unmatched purchase w.r.t to payment which came later than timer.delay.time   		 
 		processed
@@ -100,7 +101,7 @@ public class MultiStreamJob {
 				.addSink(KafkaUtil.newFlinkKafkaProducer
 							(parameterTool.getRequired("kafka.purchase.unmatched.topic"),
 							parameterTool))
-				.name("UnMatched purchases");
+				.uid("UnMatched purchases");
 							
 		//Push late or unmatched payment w.r.t to purchase which came later than timer.delay.time		
 		processed
@@ -109,7 +110,7 @@ public class MultiStreamJob {
 				.addSink(KafkaUtil.newFlinkKafkaProducer
 							(parameterTool.getRequired("kafka.payment.unmatched.topic"),
 						  	 parameterTool))
-				.name("UnMatched payments");					
+				.uid("UnMatched payments");					
 
 		env.execute("Multistream Event Time Join");
 	}
