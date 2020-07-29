@@ -63,14 +63,16 @@ public class MultiStreamJob {
 		// Comment for unit testing
 		//Read from purchase Topic and Map to Purchase 
 		DataStream<Purchase> purchaseInput = env
-		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
+				.addSource(KafkaUtil.
+							newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
 				.flatMap(new JSONToPurchase())
 				.uid("Purchase Input");
 		
 		// Comment for unit testing		
 		//Read from payment Topic and Map to Payment
 		DataStream<Payment> paymentInput = env
-		        .addSource(KafkaUtil.newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
+				.addSource(KafkaUtil.
+							newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
 				.flatMap(new JSONToPayment())
 				.uid("Payment Input");
 
@@ -89,18 +91,18 @@ public class MultiStreamJob {
 
 		//Push matched deal to deal topic
 		processed.map(new MapToDealJSON())
-				 .addSink(KafkaUtil.newFlinkKafkaProducer
-							(parameterTool.getRequired("kafka.deal.topic"),
-				   			parameterTool))
+				 .addSink(KafkaUtil.newFlinkKafkaProducer(
+					 				"kafka.deal.topic",
+				   					parameterTool))
 				 .uid("Deal");
 
 		//Push late or unmatched purchase w.r.t to payment which came later than timer.delay.time   		 
 		processed
 				.getSideOutput(unmatchedPurchases)
 				.map(new MapToPurchaseJSON())
-				.addSink(KafkaUtil.newFlinkKafkaProducer
-							(parameterTool.getRequired("kafka.purchase.unmatched.topic"),
-							parameterTool))
+				.addSink(KafkaUtil.newFlinkKafkaProducer(
+									"kafka.purchase.unmatched.topic",
+									parameterTool))
 				.uid("UnMatched purchases");
 							
 		//Push late or unmatched payment w.r.t to purchase which came later than timer.delay.time		
@@ -108,8 +110,8 @@ public class MultiStreamJob {
 				.getSideOutput(unmatchedPayments)
 				.map(new MapToPaymentJSON())
 				.addSink(KafkaUtil.newFlinkKafkaProducer
-							(parameterTool.getRequired("kafka.payment.unmatched.topic"),
-						  	 parameterTool))
+									("kafka.payment.unmatched.topic",
+						  	 		parameterTool))
 				.uid("UnMatched payments");					
 
 		env.execute("Multistream Event Time Join");
@@ -122,7 +124,7 @@ public class MultiStreamJob {
 	public static class DealMatcher extends KeyedCoProcessFunction<String, Purchase, Payment, Deal> {
 
 		private static final long serialVersionUID = 13434343455656L;
-		private static final Logger log = LoggerFactory.getLogger(DealMatcher.class);
+		//private static final Logger log = LoggerFactory.getLogger(DealMatcher.class);
 
 		private ValueState<Purchase> purchaseState;
 		private ValueState<Payment> paymentState;

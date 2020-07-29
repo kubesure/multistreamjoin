@@ -1,11 +1,8 @@
 package io.kubesure.multistream.sources;
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Purchase;
 
@@ -13,7 +10,7 @@ public class PurchaseSource implements SourceFunction<Purchase> {
 
    
     private static final long serialVersionUID = -821842602548548856L;
-    private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
+    //private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
 
     private long withDelay = 500l;
     private int produce;

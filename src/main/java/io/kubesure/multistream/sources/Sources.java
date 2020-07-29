@@ -13,6 +13,8 @@ public class Sources {
     public static DataStream<Purchase> purchaseSource(StreamExecutionEnvironment env){
 
         DataStream<Purchase> purchases = env.addSource(new SourceFunction<Purchase>() {
+            
+            private static final long serialVersionUID = 7624720720188441164L;
             private volatile boolean running = true;
 
             @Override
@@ -38,6 +40,7 @@ public class Sources {
     public static DataStream<Payment> paymentSource(StreamExecutionEnvironment env){
 
         DataStream<Payment> payments = env.addSource(new SourceFunction<Payment>() {
+            private static final long serialVersionUID = -5325807883856682647L;
             private volatile boolean running = true;
 
             @Override

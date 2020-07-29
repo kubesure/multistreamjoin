@@ -13,7 +13,7 @@ public class KafkaUtil {
 	public static FlinkKafkaProducer<String> newFlinkKafkaProducer(String topic, ParameterTool parameterTool) {
 		// TODO: replace depricated constructor
 		FlinkKafkaProducer<String> kafkaProducer = new FlinkKafkaProducer<String>(
-			    topic,
+				parameterTool.getRequired(topic),
 				new SimpleStringSchema(),
 				parameterTool.getProperties());
 		kafkaProducer.setWriteTimestampToKafka(true);

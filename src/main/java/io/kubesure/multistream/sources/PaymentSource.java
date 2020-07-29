@@ -3,15 +3,13 @@ package io.kubesure.multistream.sources;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Payment;
 
 public class PaymentSource implements SourceFunction<Payment> {
 
     private static final long serialVersionUID = 6910755227184782112L;
-    private static final Logger log = LoggerFactory.getLogger(PaymentSource.class);
+    //private static final Logger log = LoggerFactory.getLogger(PaymentSource.class);
 
     private long withDelay = 500l;
     private long transactionID = 1;
