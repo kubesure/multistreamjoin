@@ -1,5 +1,5 @@
 # multistreamjoin
-Multistream Join Job - Connects stream currecny Purchase with Payment and Match a Deal by tranaction of both events. Late / unmatched event is pushed to late arrived topics. See code documentation for better understanding for match working.  
+Multistream Join Job - Connects streams currency Purchase & Payment to create a Match which is called Deal. Late / unmatched event is pushed to late arrival topics. See code documentation for better understanding for match working.  
 
 
 ## Purchase 
