@@ -1,0 +1,46 @@
+[
+    {
+        "type": "record",   
+        "name": "Payment",
+        "namespace": "io.kubesure.multistream.datatypes",
+        "doc": "currency payment details",
+        "fields": [
+           {"name": "transactionID", "type": "string"},
+           {"name": "transactionDate",  "type": "long","logicalType": "local-timestamp-millis"},
+           {"name": "clientID",  "type": "string"},
+           {"name": "status",  "type": "string"},
+           {"name": "account",  "type": "string"},
+           {"name": "amount",  "type": "float"},
+           {"name": "referenceNumber",  "type": "string"}
+        ]
+    },
+    {
+        "type": "record",   
+        "name": "Purchase",
+        "namespace": "io.kubesure.multistream.datatypes",
+        "doc": "currency purchase details",
+        "fields": [
+           {"name": "transactionID", "type": "string"},
+           {"name": "transactionDate",  "type": "long","logicalType": "local-timestamp-millis"},
+           {"name": "purchaseCurrency",  "type": "string"},
+           {"name": "saleCurrency",  "type": "string"},
+           {"name": "purchaseAmount",  "type": "string"},
+           {"name": "saleAmount",  "type": "string"},
+           {"name": "rate",  "type": "float"},
+           {"name": "rateCode",  "type": "string"},
+           {"name": "buySell",  "type": "string"},
+           {"name": "clientID",  "type": "string"},
+           {"name": "channel",  "type": "string"}
+        ]
+    },
+    {
+        "type": "record",   
+        "name": "Deal",
+        "namespace": "io.kubesure.multistream.datatypes",
+        "doc": "Currency deal",
+        "fields": [
+           {"name": "purchase", "type": "io.kubesure.multistream.datatypes.Purchase"},
+           {"name": "payment", "type": "io.kubesure.multistream.datatypes.Payment"}
+        ]
+    }
+]

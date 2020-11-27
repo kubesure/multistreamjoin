@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import io.kubesure.multistream.datatypes.Purchase;
 import io.kubesure.multistream.util.Convertor;
 
-public class PurchaseSource extends CommonThread implements Runnable {
+public class PurchaseSource extends CommonThread<Purchase> implements Runnable {
 
     private boolean running = true;
     private long transactionID = 1;
@@ -31,7 +31,7 @@ public class PurchaseSource extends CommonThread implements Runnable {
         while(running && produce != 0) {
             try {
                 Purchase purchase = newPurchase("EN" + transactionID++);
-                send(Convertor.convertPurchaseToJson(purchase), "purchase");
+                sendPayload(purchase,Purchase.class, "purchase");
                 Thread.sleep(INTERVAL_TIME);
             } catch (InterruptedException txp) {
                 log.error("Error sleeping thread", txp);    
@@ -54,7 +54,7 @@ public class PurchaseSource extends CommonThread implements Runnable {
         p.setSaleAmount("238");
         p.setSaleCurrency("EUR");
         p.setTransactionID(transactionID);
-        p.setTransactionDate(new DateTime());
+        p.setTransactionDate(new DateTime().getMillis());
         return p;
     }
 }

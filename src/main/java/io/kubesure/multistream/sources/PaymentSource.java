@@ -31,7 +31,7 @@ public class PaymentSource implements SourceFunction<Payment> {
 
         while(produce !=0) {
             Payment p1 = newPayment("EN" + transactionID++);
-            ctx.emitWatermark(new Watermark(p1.getTransactionDate().getMillis()));
+            ctx.emitWatermark(new Watermark(p1.getTransactionDate()));
             ctx.collect(p1);
             Thread.sleep(withDelay);
             --produce;
@@ -46,7 +46,7 @@ public class PaymentSource implements SourceFunction<Payment> {
         p.setReferenceNumber("E32e3e");
         p.setStatus("success");
         p.setTransactionID(transactionID);
-        p.setTransactionDate(new DateTime());
+        p.setTransactionDate(new DateTime().getMillis());
         return p;
     }
 

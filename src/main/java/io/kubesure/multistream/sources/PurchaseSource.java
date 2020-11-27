@@ -34,7 +34,7 @@ public class PurchaseSource implements SourceFunction<Purchase> {
 
         while(produce != 0) {
             Purchase p1 = newPurchase("EN" + transactionID++);
-            ctx.emitWatermark(new Watermark(p1.getTransactionDate().getMillis()));
+            ctx.emitWatermark(new Watermark(p1.getTransactionDate()));
             ctx.collect(p1);
             Thread.sleep(withDelay);
             --produce;
@@ -53,7 +53,7 @@ public class PurchaseSource implements SourceFunction<Purchase> {
         p.setSaleAmount("238");
         p.setSaleCurrency("EUR");
         p.setTransactionID(transactionID);
-        p.setTransactionDate(new DateTime());
+        p.setTransactionDate(new DateTime().getMillis());
         return p;
     }
 

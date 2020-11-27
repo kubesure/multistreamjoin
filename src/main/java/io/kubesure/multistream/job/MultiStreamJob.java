@@ -163,7 +163,7 @@ public class MultiStreamJob {
 				//set timer with a timer.delay.time
 
 				//uncomment for event time or processing time
-				long delay = purchase.getEventTime() + timerDelay;
+				long delay = purchase.getTransactionDate() + timerDelay;
 				//long delay = ctx.timerService().currentProcessingTime() + timerDelay;
 
 				timerState.update(delay);
@@ -196,7 +196,7 @@ public class MultiStreamJob {
 				//set timer with a timer.delay.time
 
 				//uncomment for event time or processing time
-				long delay = payment.getEventTime() + timerDelay;
+				long delay = payment.getTransactionDate() + timerDelay;
 				//long delay = ctx.timerService().currentProcessingTime() + timerDelay;
 				timerState.update(delay);
 

@@ -3,9 +3,6 @@ package io.kubesure.multistream.util;
 import java.util.Properties;
 
 import org.apache.flink.api.java.utils.ParameterTool;
-import org.apache.flink.runtime.state.filesystem.FsStateBackend;
-import org.apache.flink.streaming.api.environment.CheckpointConfig;
-import org.apache.flink.streaming.api.environment.CheckpointConfig.ExternalizedCheckpointCleanup;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
