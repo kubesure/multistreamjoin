@@ -1,7 +1,5 @@
 package io.kubesure.multistream.job;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -15,15 +13,12 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.KeyedCoProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Deal;
 import io.kubesure.multistream.datatypes.Payment;
 import io.kubesure.multistream.datatypes.Purchase;
-import io.kubesure.multistream.util.Convertor;
 import io.kubesure.multistream.util.KafkaUtil;
 import io.kubesure.multistream.util.Util;
 
@@ -63,17 +58,17 @@ public class MultiStreamJob {
 		// Comment for unit testing
 		//Read from purchase Topic and Map to Purchase 
 		DataStream<Purchase> purchaseInput = env
-				.addSource(KafkaUtil.
-							newFlinkKafkaConsumer("kafka.purchase.input.topic", parameterTool))
-				.flatMap(new JSONToPurchase())
-				.uid("Purchase Input");
+				.addSource(KafkaUtil.<Purchase>newFlinkAvroConsumer(
+							parameterTool.getRequired("kafka.purchase.input.topic"),
+							Purchase.class, parameterTool))
+				.uid("Purchase Input"); 
 		
 		// Comment for unit testing		
 		//Read from payment Topic and Map to Payment
 		DataStream<Payment> paymentInput = env
-				.addSource(KafkaUtil.
-							newFlinkKafkaConsumer("kafka.payment.input.topic", parameterTool))
-				.flatMap(new JSONToPayment())
+				.addSource(KafkaUtil.<Payment>newFlinkAvroConsumer(
+					parameterTool.getRequired("kafka.payment.input.topic"),
+					Payment.class, parameterTool))
 				.uid("Payment Input");
 
 		//Connect purchase to payment, keyby transaction id and match payment to purchase for a deal.		
@@ -84,33 +79,38 @@ public class MultiStreamJob {
 				.uid("Match Deal");
 
 		if (log.isInfoEnabled()) {
-			processed.getSideOutput(unmatchedPurchases).print();
-			processed.getSideOutput(unmatchedPayments).print();
-			processed.print();
+			// TODO: print() is logging purchase instead of Deal after Avro generation 
+			// reason unknown. Need to implement a custom logger for print().
+			//processed.getSideOutput(unmatchedPurchases).print();
+			//processed.getSideOutput(unmatchedPayments).print();
+			//processed.print();
 		}		
 
 		//Push matched deal to deal topic
-		processed.map(new MapToDealJSON())
-				 .addSink(KafkaUtil.newFlinkKafkaProducer(
-					 				"kafka.deal.topic",
+		processed.addSink(KafkaUtil.<Deal>newFlinkAvroProducer(
+									parameterTool.getRequired("kafka.deal.topic"),
+									Deal.class,
+									parameterTool.getRequired("schema.registry.deal.subject"),
 				   					parameterTool))
 				 .uid("Deal");
 
 		//Push late or unmatched purchase w.r.t to payment which came later than timer.delay.time   		 
 		processed
 				.getSideOutput(unmatchedPurchases)
-				.map(new MapToPurchaseJSON())
-				.addSink(KafkaUtil.newFlinkKafkaProducer(
-									"kafka.purchase.unmatched.topic",
+				.addSink(KafkaUtil.<Purchase>newFlinkAvroProducer(
+									parameterTool.getRequired("kafka.purchase.unmatched.topic"),
+									Purchase.class,
+									parameterTool.getRequired("schema.registry.purchase.subject"),
 									parameterTool))
 				.uid("UnMatched purchases");
 							
 		//Push late or unmatched payment w.r.t to purchase which came later than timer.delay.time		
 		processed
 				.getSideOutput(unmatchedPayments)
-				.map(new MapToPaymentJSON())
-				.addSink(KafkaUtil.newFlinkKafkaProducer
-									("kafka.payment.unmatched.topic",
+				.addSink(KafkaUtil.newFlinkAvroProducer(
+									parameterTool.getRequired("kafka.payment.unmatched.topic"),
+									Payment.class,
+									parameterTool.getRequired("schema.registry.payment.subject"),
 						  	 		parameterTool))
 				.uid("UnMatched payments");					
 
@@ -243,147 +243,6 @@ public class MultiStreamJob {
 			timerState.clear();
 			purchaseState.clear();
 			paymentState.clear();
-		}
-	}
-
-	/**
-	 * Map purchase event read from kafka.purchase.input.topic to Purchase PoJO for deal matching
-	 * TODO: Requires a generic template to avoid repeating code
-	 */
-	private static class JSONToPurchase 
-									implements FlatMapFunction<String, Purchase> {
-
-		private static final long serialVersionUID = -686876771747690202L;		
-
-		@Override
-		public void flatMap(String purchase, Collector<Purchase> collector) {
-
-			KafkaProducer<String, String> producer = null;
-			ProducerRecord<String, String> producerRec = null;
-
-			try {
-				Purchase p = Convertor.convertToPurchase(purchase);
-				collector.collect(p);
-			} catch (Exception e) {
-				log.error("Error deserialzing purchase", e);
-				producer = KafkaUtil.newKakfaProducer(parameterTool);
-				// TODO: Define new error message payload instead of dumping exception message on DLQ
-				producerRec = new ProducerRecord<String, String>
-										(parameterTool.getRequired("kafka.purchase.dql.topic"), 
-										e.getMessage());
-				// TODO: Implement async send
-				try {
-					producer.send(producerRec).get();
-				} catch (Exception kse) {
-					log.error("Error writing message to dead letter Q", kse);
-				}
-			} finally {
-				if (producer != null) {
-					producer.close();
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Map purchase event read from kafka.payment.input.topic to Payment PoJO for deal matching
-	 * TODO: Requires a generic template to avoid repeating code
-	 */
-	private static class JSONToPayment 
-									implements FlatMapFunction<String, Payment> {
-
-		private static final long serialVersionUID = -686876771747690202L;		
-
-		@Override
-		public void flatMap(String payment, Collector<Payment> collector) {
-
-			KafkaProducer<String, String> producer = null;
-			ProducerRecord<String, String> producerRec = null;
-
-			try {
-				Payment p = Convertor.convertToPayment(payment);
-				collector.collect(p);
-			} catch (Exception e) {
-				log.error("Error deserialzing payment", e);
-				producer = KafkaUtil.newKakfaProducer(parameterTool);
-				// TODO: Define new error message payload instead of dumping exception message on DLQ
-				producerRec = new ProducerRecord<String, String>
-										(parameterTool.getRequired("kafka.purchase.dql.topic"), 
-										e.getMessage());
-				// TODO: Implement async send
-				try {
-					producer.send(producerRec).get();
-				} catch (Exception kse) {
-					log.error("Error writing message to dead letter Q", kse);
-				}
-			} finally {
-				if (producer != null) {
-					producer.close();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Map Late payment to string for push to sink on topic kafka.payment.unmatched.topic 
-	 * TODO: Requires a generic template to avoid repeating code
-	 */
-	private static class MapToPaymentJSON implements MapFunction<Payment,String> {
-
-		private static final long serialVersionUID = -686876771747614202L;
-
-		@Override
-		public String map(Payment payment) throws Exception {
-			try {
-				return Convertor.convertPaymentToJson(payment);
-			} catch (Exception e) {
-				// TODO: Handle exception post error to dead letter for re-processing
-				log.error("Error generating payment json", e);
-			}
-			// TODO: Handle null as it breaks pipeline 	
-			return null;
-		}
-	}
-
-	/**
-	 * Map Late purchase to string for push to sink on topic kafka.purchase.unmatched.topic 
-	 * TODO: Requires a generic template to avoid repeating code
-	 */
-	private static class MapToPurchaseJSON implements MapFunction<Purchase,String> {
-
-		private static final long serialVersionUID = -686876771747614202L;
-
-		@Override
-		public String map(Purchase purchase) throws Exception {
-			try {
-				return Convertor.convertPurchaseToJson(purchase);
-			} catch (Exception e) {
-				// TODO: Handle exception post error to dead letter for re-processing
-				log.error("Error generating purchase json", e);
-			}
-			// TODO: Handle null as it breaks pipeline 	
-			return null;
-		}
-	}
-
-	/**
-	 * Map matched purchase to payment Deals to string for push in sink topic kafka.deal.topic
-	 * TODO: Requires a generic template to avoid repeating code
-	 */
-	private static class MapToDealJSON implements MapFunction<Deal,String> {
-
-		private static final long serialVersionUID = -686876771747614202L;
-
-		@Override
-		public String map(Deal deal) throws Exception {
-			try {
-				return Convertor.convertDealToJson(deal);
-			} catch (Exception e) {
-				// TODO: Handle exception post error to dead letter for re-processing
-				log.error("Error generating purchase json", e);
-			}
-			// TODO: Handle null as it breaks pipeline 	
-			return null;
 		}
 	}
 }
