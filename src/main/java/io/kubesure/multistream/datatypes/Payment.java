@@ -16,7 +16,7 @@ import org.apache.avro.message.SchemaStore;
 @org.apache.avro.specific.AvroGenerated
 public class Payment extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 7196930328199665064L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Payment\",\"namespace\":\"io.kubesure.multistream.datatypes\",\"doc\":\"currency payment details\",\"fields\":[{\"name\":\"transactionID\",\"type\":\"string\"},{\"name\":\"transactionDate\",\"type\":\"long\",\"logicalType\":\"local-timestamp-millis\"},{\"name\":\"clientID\",\"type\":\"string\"},{\"name\":\"status\",\"type\":\"string\"},{\"name\":\"account\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"float\"},{\"name\":\"referenceNumber\",\"type\":\"string\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Payment\",\"namespace\":\"io.kubesure.multistream.datatypes\",\"doc\":\"currency payment details\",\"fields\":[{\"name\":\"transactionID\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"transactionDate\",\"type\":\"long\",\"logicalType\":\"local-timestamp-millis\"},{\"name\":\"clientID\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"status\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"account\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"amount\",\"type\":\"float\"},{\"name\":\"referenceNumber\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -72,13 +72,13 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
     return DECODER.decode(b);
   }
 
-  @Deprecated public java.lang.CharSequence transactionID;
-  @Deprecated public long transactionDate;
-  @Deprecated public java.lang.CharSequence clientID;
-  @Deprecated public java.lang.CharSequence status;
-  @Deprecated public java.lang.CharSequence account;
-  @Deprecated public float amount;
-  @Deprecated public java.lang.CharSequence referenceNumber;
+   private java.lang.String transactionID;
+   private long transactionDate;
+   private java.lang.String clientID;
+   private java.lang.String status;
+   private java.lang.String account;
+   private float amount;
+   private java.lang.String referenceNumber;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -97,7 +97,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param amount The new value for amount
    * @param referenceNumber The new value for referenceNumber
    */
-  public Payment(java.lang.CharSequence transactionID, java.lang.Long transactionDate, java.lang.CharSequence clientID, java.lang.CharSequence status, java.lang.CharSequence account, java.lang.Float amount, java.lang.CharSequence referenceNumber) {
+  public Payment(java.lang.String transactionID, java.lang.Long transactionDate, java.lang.String clientID, java.lang.String status, java.lang.String account, java.lang.Float amount, java.lang.String referenceNumber) {
     this.transactionID = transactionID;
     this.transactionDate = transactionDate;
     this.clientID = clientID;
@@ -127,13 +127,13 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: transactionID = (java.lang.CharSequence)value$; break;
+    case 0: transactionID = (java.lang.String)value$; break;
     case 1: transactionDate = (java.lang.Long)value$; break;
-    case 2: clientID = (java.lang.CharSequence)value$; break;
-    case 3: status = (java.lang.CharSequence)value$; break;
-    case 4: account = (java.lang.CharSequence)value$; break;
+    case 2: clientID = (java.lang.String)value$; break;
+    case 3: status = (java.lang.String)value$; break;
+    case 4: account = (java.lang.String)value$; break;
     case 5: amount = (java.lang.Float)value$; break;
-    case 6: referenceNumber = (java.lang.CharSequence)value$; break;
+    case 6: referenceNumber = (java.lang.String)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -142,7 +142,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'transactionID' field.
    * @return The value of the 'transactionID' field.
    */
-  public java.lang.CharSequence getTransactionID() {
+  public java.lang.String getTransactionID() {
     return transactionID;
   }
 
@@ -151,7 +151,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Sets the value of the 'transactionID' field.
    * @param value the value to set.
    */
-  public void setTransactionID(java.lang.CharSequence value) {
+  public void setTransactionID(java.lang.String value) {
     this.transactionID = value;
   }
 
@@ -176,7 +176,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'clientID' field.
    * @return The value of the 'clientID' field.
    */
-  public java.lang.CharSequence getClientID() {
+  public java.lang.String getClientID() {
     return clientID;
   }
 
@@ -185,7 +185,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Sets the value of the 'clientID' field.
    * @param value the value to set.
    */
-  public void setClientID(java.lang.CharSequence value) {
+  public void setClientID(java.lang.String value) {
     this.clientID = value;
   }
 
@@ -193,7 +193,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'status' field.
    * @return The value of the 'status' field.
    */
-  public java.lang.CharSequence getStatus() {
+  public java.lang.String getStatus() {
     return status;
   }
 
@@ -202,7 +202,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Sets the value of the 'status' field.
    * @param value the value to set.
    */
-  public void setStatus(java.lang.CharSequence value) {
+  public void setStatus(java.lang.String value) {
     this.status = value;
   }
 
@@ -210,7 +210,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'account' field.
    * @return The value of the 'account' field.
    */
-  public java.lang.CharSequence getAccount() {
+  public java.lang.String getAccount() {
     return account;
   }
 
@@ -219,7 +219,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Sets the value of the 'account' field.
    * @param value the value to set.
    */
-  public void setAccount(java.lang.CharSequence value) {
+  public void setAccount(java.lang.String value) {
     this.account = value;
   }
 
@@ -244,7 +244,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'referenceNumber' field.
    * @return The value of the 'referenceNumber' field.
    */
-  public java.lang.CharSequence getReferenceNumber() {
+  public java.lang.String getReferenceNumber() {
     return referenceNumber;
   }
 
@@ -253,7 +253,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
    * Sets the value of the 'referenceNumber' field.
    * @param value the value to set.
    */
-  public void setReferenceNumber(java.lang.CharSequence value) {
+  public void setReferenceNumber(java.lang.String value) {
     this.referenceNumber = value;
   }
 
@@ -297,13 +297,13 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<Payment>
     implements org.apache.avro.data.RecordBuilder<Payment> {
 
-    private java.lang.CharSequence transactionID;
+    private java.lang.String transactionID;
     private long transactionDate;
-    private java.lang.CharSequence clientID;
-    private java.lang.CharSequence status;
-    private java.lang.CharSequence account;
+    private java.lang.String clientID;
+    private java.lang.String status;
+    private java.lang.String account;
     private float amount;
-    private java.lang.CharSequence referenceNumber;
+    private java.lang.String referenceNumber;
 
     /** Creates a new Builder */
     private Builder() {
@@ -386,7 +386,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'transactionID' field.
       * @return The value.
       */
-    public java.lang.CharSequence getTransactionID() {
+    public java.lang.String getTransactionID() {
       return transactionID;
     }
 
@@ -396,7 +396,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'transactionID'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Payment.Builder setTransactionID(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Payment.Builder setTransactionID(java.lang.String value) {
       validate(fields()[0], value);
       this.transactionID = value;
       fieldSetFlags()[0] = true;
@@ -465,7 +465,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'clientID' field.
       * @return The value.
       */
-    public java.lang.CharSequence getClientID() {
+    public java.lang.String getClientID() {
       return clientID;
     }
 
@@ -475,7 +475,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'clientID'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Payment.Builder setClientID(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Payment.Builder setClientID(java.lang.String value) {
       validate(fields()[2], value);
       this.clientID = value;
       fieldSetFlags()[2] = true;
@@ -505,7 +505,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'status' field.
       * @return The value.
       */
-    public java.lang.CharSequence getStatus() {
+    public java.lang.String getStatus() {
       return status;
     }
 
@@ -515,7 +515,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'status'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Payment.Builder setStatus(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Payment.Builder setStatus(java.lang.String value) {
       validate(fields()[3], value);
       this.status = value;
       fieldSetFlags()[3] = true;
@@ -545,7 +545,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'account' field.
       * @return The value.
       */
-    public java.lang.CharSequence getAccount() {
+    public java.lang.String getAccount() {
       return account;
     }
 
@@ -555,7 +555,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'account'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Payment.Builder setAccount(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Payment.Builder setAccount(java.lang.String value) {
       validate(fields()[4], value);
       this.account = value;
       fieldSetFlags()[4] = true;
@@ -624,7 +624,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'referenceNumber' field.
       * @return The value.
       */
-    public java.lang.CharSequence getReferenceNumber() {
+    public java.lang.String getReferenceNumber() {
       return referenceNumber;
     }
 
@@ -634,7 +634,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
       * @param value The value of 'referenceNumber'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Payment.Builder setReferenceNumber(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Payment.Builder setReferenceNumber(java.lang.String value) {
       validate(fields()[6], value);
       this.referenceNumber = value;
       fieldSetFlags()[6] = true;
@@ -665,13 +665,13 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
     public Payment build() {
       try {
         Payment record = new Payment();
-        record.transactionID = fieldSetFlags()[0] ? this.transactionID : (java.lang.CharSequence) defaultValue(fields()[0]);
+        record.transactionID = fieldSetFlags()[0] ? this.transactionID : (java.lang.String) defaultValue(fields()[0]);
         record.transactionDate = fieldSetFlags()[1] ? this.transactionDate : (java.lang.Long) defaultValue(fields()[1]);
-        record.clientID = fieldSetFlags()[2] ? this.clientID : (java.lang.CharSequence) defaultValue(fields()[2]);
-        record.status = fieldSetFlags()[3] ? this.status : (java.lang.CharSequence) defaultValue(fields()[3]);
-        record.account = fieldSetFlags()[4] ? this.account : (java.lang.CharSequence) defaultValue(fields()[4]);
+        record.clientID = fieldSetFlags()[2] ? this.clientID : (java.lang.String) defaultValue(fields()[2]);
+        record.status = fieldSetFlags()[3] ? this.status : (java.lang.String) defaultValue(fields()[3]);
+        record.account = fieldSetFlags()[4] ? this.account : (java.lang.String) defaultValue(fields()[4]);
         record.amount = fieldSetFlags()[5] ? this.amount : (java.lang.Float) defaultValue(fields()[5]);
-        record.referenceNumber = fieldSetFlags()[6] ? this.referenceNumber : (java.lang.CharSequence) defaultValue(fields()[6]);
+        record.referenceNumber = fieldSetFlags()[6] ? this.referenceNumber : (java.lang.String) defaultValue(fields()[6]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -725,25 +725,25 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
   {
     org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
     if (fieldOrder == null) {
-      this.transactionID = in.readString(this.transactionID instanceof Utf8 ? (Utf8)this.transactionID : null);
+      this.transactionID = in.readString();
 
       this.transactionDate = in.readLong();
 
-      this.clientID = in.readString(this.clientID instanceof Utf8 ? (Utf8)this.clientID : null);
+      this.clientID = in.readString();
 
-      this.status = in.readString(this.status instanceof Utf8 ? (Utf8)this.status : null);
+      this.status = in.readString();
 
-      this.account = in.readString(this.account instanceof Utf8 ? (Utf8)this.account : null);
+      this.account = in.readString();
 
       this.amount = in.readFloat();
 
-      this.referenceNumber = in.readString(this.referenceNumber instanceof Utf8 ? (Utf8)this.referenceNumber : null);
+      this.referenceNumber = in.readString();
 
     } else {
       for (int i = 0; i < 7; i++) {
         switch (fieldOrder[i].pos()) {
         case 0:
-          this.transactionID = in.readString(this.transactionID instanceof Utf8 ? (Utf8)this.transactionID : null);
+          this.transactionID = in.readString();
           break;
 
         case 1:
@@ -751,15 +751,15 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
           break;
 
         case 2:
-          this.clientID = in.readString(this.clientID instanceof Utf8 ? (Utf8)this.clientID : null);
+          this.clientID = in.readString();
           break;
 
         case 3:
-          this.status = in.readString(this.status instanceof Utf8 ? (Utf8)this.status : null);
+          this.status = in.readString();
           break;
 
         case 4:
-          this.account = in.readString(this.account instanceof Utf8 ? (Utf8)this.account : null);
+          this.account = in.readString();
           break;
 
         case 5:
@@ -767,7 +767,7 @@ public class Payment extends org.apache.avro.specific.SpecificRecordBase impleme
           break;
 
         case 6:
-          this.referenceNumber = in.readString(this.referenceNumber instanceof Utf8 ? (Utf8)this.referenceNumber : null);
+          this.referenceNumber = in.readString();
           break;
 
         default:

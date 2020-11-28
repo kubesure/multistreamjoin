@@ -5,7 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Payment;
-import io.kubesure.multistream.util.Convertor;
+import io.kubesure.multistream.datatypes.Payment.Builder;
+import io.kubesure.multistream.util.TimeUtil;
 
 public class PaymentSource extends CommonThread<Payment> implements Runnable {
 
@@ -44,14 +45,15 @@ public class PaymentSource extends CommonThread<Payment> implements Runnable {
     }
 
     private Payment newPayment(String transactionID) {
-        Payment p = new Payment();
-        p.setAccount("122332");
-        p.setAmount(989f);
-        p.setClientID("234567");
-        p.setReferenceNumber("E32e3e");
-        p.setStatus("success");
-        p.setTransactionID(transactionID);
-        p.setTransactionDate(new DateTime().getMillis());
-        return p;
+        Builder builder = Payment.newBuilder();
+        builder.setAccount("122332")
+        .setAmount(989f)
+        .setClientID("234567")
+        .setReferenceNumber("E32e3e")
+        .setStatus("success")
+        .setTransactionID(transactionID)
+        .setTransactionDate(new DateTime().getMillis());
+        log.info("Payment --"+builder.getTransactionID() + "--"+ TimeUtil.ISOString(builder.getTransactionDate()));
+        return builder.build();
     }
 }

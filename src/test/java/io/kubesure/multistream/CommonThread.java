@@ -5,9 +5,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.kubesure.multistream.datatypes.Payment;
-import io.kubesure.multistream.util.KafkaU;
-import io.kubesure.multistream.util.Util;
+import io.kubesure.multistream.util.KafkaUtil;
 
 public class CommonThread<T> {
 
@@ -25,7 +23,7 @@ public class CommonThread<T> {
     }*/
 
     protected <T> void sendPayload(Object obj,Class<T> tclass,String topic) throws Exception {
-        KafkaProducer<String,T> producer = KafkaU.<T>newKakfaAvroProducer();
+        KafkaProducer<String,T> producer = KafkaUtil.<T>newKakfaAvroProducer();
         ProducerRecord<String,T> producerRec =
              new ProducerRecord<String,T>(topic,tclass.cast(obj));
         try {

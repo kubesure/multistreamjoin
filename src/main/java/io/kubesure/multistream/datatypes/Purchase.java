@@ -16,7 +16,7 @@ import org.apache.avro.message.SchemaStore;
 @org.apache.avro.specific.AvroGenerated
 public class Purchase extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = 1183716479619749094L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Purchase\",\"namespace\":\"io.kubesure.multistream.datatypes\",\"doc\":\"currency purchase details\",\"fields\":[{\"name\":\"transactionID\",\"type\":\"string\"},{\"name\":\"transactionDate\",\"type\":\"long\",\"logicalType\":\"local-timestamp-millis\"},{\"name\":\"purchaseCurrency\",\"type\":\"string\"},{\"name\":\"saleCurrency\",\"type\":\"string\"},{\"name\":\"purchaseAmount\",\"type\":\"string\"},{\"name\":\"saleAmount\",\"type\":\"string\"},{\"name\":\"rate\",\"type\":\"float\"},{\"name\":\"rateCode\",\"type\":\"string\"},{\"name\":\"buySell\",\"type\":\"string\"},{\"name\":\"clientID\",\"type\":\"string\"},{\"name\":\"channel\",\"type\":\"string\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Purchase\",\"namespace\":\"io.kubesure.multistream.datatypes\",\"doc\":\"currency purchase details\",\"fields\":[{\"name\":\"transactionID\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"transactionDate\",\"type\":\"long\",\"logicalType\":\"local-timestamp-millis\"},{\"name\":\"purchaseCurrency\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"saleCurrency\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"purchaseAmount\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"saleAmount\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"rate\",\"type\":\"float\"},{\"name\":\"rateCode\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"buySell\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"clientID\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"channel\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -72,17 +72,17 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
     return DECODER.decode(b);
   }
 
-  @Deprecated public java.lang.CharSequence transactionID;
-  @Deprecated public long transactionDate;
-  @Deprecated public java.lang.CharSequence purchaseCurrency;
-  @Deprecated public java.lang.CharSequence saleCurrency;
-  @Deprecated public java.lang.CharSequence purchaseAmount;
-  @Deprecated public java.lang.CharSequence saleAmount;
-  @Deprecated public float rate;
-  @Deprecated public java.lang.CharSequence rateCode;
-  @Deprecated public java.lang.CharSequence buySell;
-  @Deprecated public java.lang.CharSequence clientID;
-  @Deprecated public java.lang.CharSequence channel;
+   private java.lang.String transactionID;
+   private long transactionDate;
+   private java.lang.String purchaseCurrency;
+   private java.lang.String saleCurrency;
+   private java.lang.String purchaseAmount;
+   private java.lang.String saleAmount;
+   private float rate;
+   private java.lang.String rateCode;
+   private java.lang.String buySell;
+   private java.lang.String clientID;
+   private java.lang.String channel;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -105,7 +105,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * @param clientID The new value for clientID
    * @param channel The new value for channel
    */
-  public Purchase(java.lang.CharSequence transactionID, java.lang.Long transactionDate, java.lang.CharSequence purchaseCurrency, java.lang.CharSequence saleCurrency, java.lang.CharSequence purchaseAmount, java.lang.CharSequence saleAmount, java.lang.Float rate, java.lang.CharSequence rateCode, java.lang.CharSequence buySell, java.lang.CharSequence clientID, java.lang.CharSequence channel) {
+  public Purchase(java.lang.String transactionID, java.lang.Long transactionDate, java.lang.String purchaseCurrency, java.lang.String saleCurrency, java.lang.String purchaseAmount, java.lang.String saleAmount, java.lang.Float rate, java.lang.String rateCode, java.lang.String buySell, java.lang.String clientID, java.lang.String channel) {
     this.transactionID = transactionID;
     this.transactionDate = transactionDate;
     this.purchaseCurrency = purchaseCurrency;
@@ -143,17 +143,17 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: transactionID = (java.lang.CharSequence)value$; break;
+    case 0: transactionID = (java.lang.String)value$; break;
     case 1: transactionDate = (java.lang.Long)value$; break;
-    case 2: purchaseCurrency = (java.lang.CharSequence)value$; break;
-    case 3: saleCurrency = (java.lang.CharSequence)value$; break;
-    case 4: purchaseAmount = (java.lang.CharSequence)value$; break;
-    case 5: saleAmount = (java.lang.CharSequence)value$; break;
+    case 2: purchaseCurrency = (java.lang.String)value$; break;
+    case 3: saleCurrency = (java.lang.String)value$; break;
+    case 4: purchaseAmount = (java.lang.String)value$; break;
+    case 5: saleAmount = (java.lang.String)value$; break;
     case 6: rate = (java.lang.Float)value$; break;
-    case 7: rateCode = (java.lang.CharSequence)value$; break;
-    case 8: buySell = (java.lang.CharSequence)value$; break;
-    case 9: clientID = (java.lang.CharSequence)value$; break;
-    case 10: channel = (java.lang.CharSequence)value$; break;
+    case 7: rateCode = (java.lang.String)value$; break;
+    case 8: buySell = (java.lang.String)value$; break;
+    case 9: clientID = (java.lang.String)value$; break;
+    case 10: channel = (java.lang.String)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -162,7 +162,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'transactionID' field.
    * @return The value of the 'transactionID' field.
    */
-  public java.lang.CharSequence getTransactionID() {
+  public java.lang.String getTransactionID() {
     return transactionID;
   }
 
@@ -171,7 +171,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'transactionID' field.
    * @param value the value to set.
    */
-  public void setTransactionID(java.lang.CharSequence value) {
+  public void setTransactionID(java.lang.String value) {
     this.transactionID = value;
   }
 
@@ -196,7 +196,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'purchaseCurrency' field.
    * @return The value of the 'purchaseCurrency' field.
    */
-  public java.lang.CharSequence getPurchaseCurrency() {
+  public java.lang.String getPurchaseCurrency() {
     return purchaseCurrency;
   }
 
@@ -205,7 +205,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'purchaseCurrency' field.
    * @param value the value to set.
    */
-  public void setPurchaseCurrency(java.lang.CharSequence value) {
+  public void setPurchaseCurrency(java.lang.String value) {
     this.purchaseCurrency = value;
   }
 
@@ -213,7 +213,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'saleCurrency' field.
    * @return The value of the 'saleCurrency' field.
    */
-  public java.lang.CharSequence getSaleCurrency() {
+  public java.lang.String getSaleCurrency() {
     return saleCurrency;
   }
 
@@ -222,7 +222,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'saleCurrency' field.
    * @param value the value to set.
    */
-  public void setSaleCurrency(java.lang.CharSequence value) {
+  public void setSaleCurrency(java.lang.String value) {
     this.saleCurrency = value;
   }
 
@@ -230,7 +230,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'purchaseAmount' field.
    * @return The value of the 'purchaseAmount' field.
    */
-  public java.lang.CharSequence getPurchaseAmount() {
+  public java.lang.String getPurchaseAmount() {
     return purchaseAmount;
   }
 
@@ -239,7 +239,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'purchaseAmount' field.
    * @param value the value to set.
    */
-  public void setPurchaseAmount(java.lang.CharSequence value) {
+  public void setPurchaseAmount(java.lang.String value) {
     this.purchaseAmount = value;
   }
 
@@ -247,7 +247,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'saleAmount' field.
    * @return The value of the 'saleAmount' field.
    */
-  public java.lang.CharSequence getSaleAmount() {
+  public java.lang.String getSaleAmount() {
     return saleAmount;
   }
 
@@ -256,7 +256,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'saleAmount' field.
    * @param value the value to set.
    */
-  public void setSaleAmount(java.lang.CharSequence value) {
+  public void setSaleAmount(java.lang.String value) {
     this.saleAmount = value;
   }
 
@@ -281,7 +281,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'rateCode' field.
    * @return The value of the 'rateCode' field.
    */
-  public java.lang.CharSequence getRateCode() {
+  public java.lang.String getRateCode() {
     return rateCode;
   }
 
@@ -290,7 +290,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'rateCode' field.
    * @param value the value to set.
    */
-  public void setRateCode(java.lang.CharSequence value) {
+  public void setRateCode(java.lang.String value) {
     this.rateCode = value;
   }
 
@@ -298,7 +298,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'buySell' field.
    * @return The value of the 'buySell' field.
    */
-  public java.lang.CharSequence getBuySell() {
+  public java.lang.String getBuySell() {
     return buySell;
   }
 
@@ -307,7 +307,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'buySell' field.
    * @param value the value to set.
    */
-  public void setBuySell(java.lang.CharSequence value) {
+  public void setBuySell(java.lang.String value) {
     this.buySell = value;
   }
 
@@ -315,7 +315,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'clientID' field.
    * @return The value of the 'clientID' field.
    */
-  public java.lang.CharSequence getClientID() {
+  public java.lang.String getClientID() {
     return clientID;
   }
 
@@ -324,7 +324,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'clientID' field.
    * @param value the value to set.
    */
-  public void setClientID(java.lang.CharSequence value) {
+  public void setClientID(java.lang.String value) {
     this.clientID = value;
   }
 
@@ -332,7 +332,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Gets the value of the 'channel' field.
    * @return The value of the 'channel' field.
    */
-  public java.lang.CharSequence getChannel() {
+  public java.lang.String getChannel() {
     return channel;
   }
 
@@ -341,7 +341,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
    * Sets the value of the 'channel' field.
    * @param value the value to set.
    */
-  public void setChannel(java.lang.CharSequence value) {
+  public void setChannel(java.lang.String value) {
     this.channel = value;
   }
 
@@ -385,17 +385,17 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<Purchase>
     implements org.apache.avro.data.RecordBuilder<Purchase> {
 
-    private java.lang.CharSequence transactionID;
+    private java.lang.String transactionID;
     private long transactionDate;
-    private java.lang.CharSequence purchaseCurrency;
-    private java.lang.CharSequence saleCurrency;
-    private java.lang.CharSequence purchaseAmount;
-    private java.lang.CharSequence saleAmount;
+    private java.lang.String purchaseCurrency;
+    private java.lang.String saleCurrency;
+    private java.lang.String purchaseAmount;
+    private java.lang.String saleAmount;
     private float rate;
-    private java.lang.CharSequence rateCode;
-    private java.lang.CharSequence buySell;
-    private java.lang.CharSequence clientID;
-    private java.lang.CharSequence channel;
+    private java.lang.String rateCode;
+    private java.lang.String buySell;
+    private java.lang.String clientID;
+    private java.lang.String channel;
 
     /** Creates a new Builder */
     private Builder() {
@@ -510,7 +510,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'transactionID' field.
       * @return The value.
       */
-    public java.lang.CharSequence getTransactionID() {
+    public java.lang.String getTransactionID() {
       return transactionID;
     }
 
@@ -520,7 +520,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'transactionID'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setTransactionID(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setTransactionID(java.lang.String value) {
       validate(fields()[0], value);
       this.transactionID = value;
       fieldSetFlags()[0] = true;
@@ -589,7 +589,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'purchaseCurrency' field.
       * @return The value.
       */
-    public java.lang.CharSequence getPurchaseCurrency() {
+    public java.lang.String getPurchaseCurrency() {
       return purchaseCurrency;
     }
 
@@ -599,7 +599,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'purchaseCurrency'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setPurchaseCurrency(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setPurchaseCurrency(java.lang.String value) {
       validate(fields()[2], value);
       this.purchaseCurrency = value;
       fieldSetFlags()[2] = true;
@@ -629,7 +629,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'saleCurrency' field.
       * @return The value.
       */
-    public java.lang.CharSequence getSaleCurrency() {
+    public java.lang.String getSaleCurrency() {
       return saleCurrency;
     }
 
@@ -639,7 +639,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'saleCurrency'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setSaleCurrency(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setSaleCurrency(java.lang.String value) {
       validate(fields()[3], value);
       this.saleCurrency = value;
       fieldSetFlags()[3] = true;
@@ -669,7 +669,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'purchaseAmount' field.
       * @return The value.
       */
-    public java.lang.CharSequence getPurchaseAmount() {
+    public java.lang.String getPurchaseAmount() {
       return purchaseAmount;
     }
 
@@ -679,7 +679,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'purchaseAmount'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setPurchaseAmount(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setPurchaseAmount(java.lang.String value) {
       validate(fields()[4], value);
       this.purchaseAmount = value;
       fieldSetFlags()[4] = true;
@@ -709,7 +709,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'saleAmount' field.
       * @return The value.
       */
-    public java.lang.CharSequence getSaleAmount() {
+    public java.lang.String getSaleAmount() {
       return saleAmount;
     }
 
@@ -719,7 +719,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'saleAmount'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setSaleAmount(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setSaleAmount(java.lang.String value) {
       validate(fields()[5], value);
       this.saleAmount = value;
       fieldSetFlags()[5] = true;
@@ -788,7 +788,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'rateCode' field.
       * @return The value.
       */
-    public java.lang.CharSequence getRateCode() {
+    public java.lang.String getRateCode() {
       return rateCode;
     }
 
@@ -798,7 +798,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'rateCode'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setRateCode(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setRateCode(java.lang.String value) {
       validate(fields()[7], value);
       this.rateCode = value;
       fieldSetFlags()[7] = true;
@@ -828,7 +828,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'buySell' field.
       * @return The value.
       */
-    public java.lang.CharSequence getBuySell() {
+    public java.lang.String getBuySell() {
       return buySell;
     }
 
@@ -838,7 +838,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'buySell'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setBuySell(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setBuySell(java.lang.String value) {
       validate(fields()[8], value);
       this.buySell = value;
       fieldSetFlags()[8] = true;
@@ -868,7 +868,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'clientID' field.
       * @return The value.
       */
-    public java.lang.CharSequence getClientID() {
+    public java.lang.String getClientID() {
       return clientID;
     }
 
@@ -878,7 +878,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'clientID'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setClientID(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setClientID(java.lang.String value) {
       validate(fields()[9], value);
       this.clientID = value;
       fieldSetFlags()[9] = true;
@@ -908,7 +908,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * Gets the value of the 'channel' field.
       * @return The value.
       */
-    public java.lang.CharSequence getChannel() {
+    public java.lang.String getChannel() {
       return channel;
     }
 
@@ -918,7 +918,7 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'channel'.
       * @return This builder.
       */
-    public io.kubesure.multistream.datatypes.Purchase.Builder setChannel(java.lang.CharSequence value) {
+    public io.kubesure.multistream.datatypes.Purchase.Builder setChannel(java.lang.String value) {
       validate(fields()[10], value);
       this.channel = value;
       fieldSetFlags()[10] = true;
@@ -949,17 +949,17 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
     public Purchase build() {
       try {
         Purchase record = new Purchase();
-        record.transactionID = fieldSetFlags()[0] ? this.transactionID : (java.lang.CharSequence) defaultValue(fields()[0]);
+        record.transactionID = fieldSetFlags()[0] ? this.transactionID : (java.lang.String) defaultValue(fields()[0]);
         record.transactionDate = fieldSetFlags()[1] ? this.transactionDate : (java.lang.Long) defaultValue(fields()[1]);
-        record.purchaseCurrency = fieldSetFlags()[2] ? this.purchaseCurrency : (java.lang.CharSequence) defaultValue(fields()[2]);
-        record.saleCurrency = fieldSetFlags()[3] ? this.saleCurrency : (java.lang.CharSequence) defaultValue(fields()[3]);
-        record.purchaseAmount = fieldSetFlags()[4] ? this.purchaseAmount : (java.lang.CharSequence) defaultValue(fields()[4]);
-        record.saleAmount = fieldSetFlags()[5] ? this.saleAmount : (java.lang.CharSequence) defaultValue(fields()[5]);
+        record.purchaseCurrency = fieldSetFlags()[2] ? this.purchaseCurrency : (java.lang.String) defaultValue(fields()[2]);
+        record.saleCurrency = fieldSetFlags()[3] ? this.saleCurrency : (java.lang.String) defaultValue(fields()[3]);
+        record.purchaseAmount = fieldSetFlags()[4] ? this.purchaseAmount : (java.lang.String) defaultValue(fields()[4]);
+        record.saleAmount = fieldSetFlags()[5] ? this.saleAmount : (java.lang.String) defaultValue(fields()[5]);
         record.rate = fieldSetFlags()[6] ? this.rate : (java.lang.Float) defaultValue(fields()[6]);
-        record.rateCode = fieldSetFlags()[7] ? this.rateCode : (java.lang.CharSequence) defaultValue(fields()[7]);
-        record.buySell = fieldSetFlags()[8] ? this.buySell : (java.lang.CharSequence) defaultValue(fields()[8]);
-        record.clientID = fieldSetFlags()[9] ? this.clientID : (java.lang.CharSequence) defaultValue(fields()[9]);
-        record.channel = fieldSetFlags()[10] ? this.channel : (java.lang.CharSequence) defaultValue(fields()[10]);
+        record.rateCode = fieldSetFlags()[7] ? this.rateCode : (java.lang.String) defaultValue(fields()[7]);
+        record.buySell = fieldSetFlags()[8] ? this.buySell : (java.lang.String) defaultValue(fields()[8]);
+        record.clientID = fieldSetFlags()[9] ? this.clientID : (java.lang.String) defaultValue(fields()[9]);
+        record.channel = fieldSetFlags()[10] ? this.channel : (java.lang.String) defaultValue(fields()[10]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -1021,33 +1021,33 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
   {
     org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
     if (fieldOrder == null) {
-      this.transactionID = in.readString(this.transactionID instanceof Utf8 ? (Utf8)this.transactionID : null);
+      this.transactionID = in.readString();
 
       this.transactionDate = in.readLong();
 
-      this.purchaseCurrency = in.readString(this.purchaseCurrency instanceof Utf8 ? (Utf8)this.purchaseCurrency : null);
+      this.purchaseCurrency = in.readString();
 
-      this.saleCurrency = in.readString(this.saleCurrency instanceof Utf8 ? (Utf8)this.saleCurrency : null);
+      this.saleCurrency = in.readString();
 
-      this.purchaseAmount = in.readString(this.purchaseAmount instanceof Utf8 ? (Utf8)this.purchaseAmount : null);
+      this.purchaseAmount = in.readString();
 
-      this.saleAmount = in.readString(this.saleAmount instanceof Utf8 ? (Utf8)this.saleAmount : null);
+      this.saleAmount = in.readString();
 
       this.rate = in.readFloat();
 
-      this.rateCode = in.readString(this.rateCode instanceof Utf8 ? (Utf8)this.rateCode : null);
+      this.rateCode = in.readString();
 
-      this.buySell = in.readString(this.buySell instanceof Utf8 ? (Utf8)this.buySell : null);
+      this.buySell = in.readString();
 
-      this.clientID = in.readString(this.clientID instanceof Utf8 ? (Utf8)this.clientID : null);
+      this.clientID = in.readString();
 
-      this.channel = in.readString(this.channel instanceof Utf8 ? (Utf8)this.channel : null);
+      this.channel = in.readString();
 
     } else {
       for (int i = 0; i < 11; i++) {
         switch (fieldOrder[i].pos()) {
         case 0:
-          this.transactionID = in.readString(this.transactionID instanceof Utf8 ? (Utf8)this.transactionID : null);
+          this.transactionID = in.readString();
           break;
 
         case 1:
@@ -1055,19 +1055,19 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
           break;
 
         case 2:
-          this.purchaseCurrency = in.readString(this.purchaseCurrency instanceof Utf8 ? (Utf8)this.purchaseCurrency : null);
+          this.purchaseCurrency = in.readString();
           break;
 
         case 3:
-          this.saleCurrency = in.readString(this.saleCurrency instanceof Utf8 ? (Utf8)this.saleCurrency : null);
+          this.saleCurrency = in.readString();
           break;
 
         case 4:
-          this.purchaseAmount = in.readString(this.purchaseAmount instanceof Utf8 ? (Utf8)this.purchaseAmount : null);
+          this.purchaseAmount = in.readString();
           break;
 
         case 5:
-          this.saleAmount = in.readString(this.saleAmount instanceof Utf8 ? (Utf8)this.saleAmount : null);
+          this.saleAmount = in.readString();
           break;
 
         case 6:
@@ -1075,19 +1075,19 @@ public class Purchase extends org.apache.avro.specific.SpecificRecordBase implem
           break;
 
         case 7:
-          this.rateCode = in.readString(this.rateCode instanceof Utf8 ? (Utf8)this.rateCode : null);
+          this.rateCode = in.readString();
           break;
 
         case 8:
-          this.buySell = in.readString(this.buySell instanceof Utf8 ? (Utf8)this.buySell : null);
+          this.buySell = in.readString();
           break;
 
         case 9:
-          this.clientID = in.readString(this.clientID instanceof Utf8 ? (Utf8)this.clientID : null);
+          this.clientID = in.readString();
           break;
 
         case 10:
-          this.channel = in.readString(this.channel instanceof Utf8 ? (Utf8)this.channel : null);
+          this.channel = in.readString();
           break;
 
         default:

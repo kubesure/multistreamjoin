@@ -546,6 +546,9 @@
 						<includes>
 							<include>deal.avsc</include>
 						</includes>
+						<fieldVisibility>private</fieldVisibility>
+						<stringType>String</stringType>
+						<enableDecimalLogicalType>true</enableDecimalLogicalType>
 					</configuration>
 			</execution>
      	 </executions>

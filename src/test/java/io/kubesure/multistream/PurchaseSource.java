@@ -5,7 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Purchase;
-import io.kubesure.multistream.util.Convertor;
+import io.kubesure.multistream.datatypes.Purchase.Builder;
+import io.kubesure.multistream.util.TimeUtil;
 
 public class PurchaseSource extends CommonThread<Purchase> implements Runnable {
 
@@ -43,18 +44,19 @@ public class PurchaseSource extends CommonThread<Purchase> implements Runnable {
     }
 
     private Purchase newPurchase(String transactionID) {
-        Purchase p = new Purchase();
-        p.setBuySell("b");
-        p.setChannel("online");
-        p.setClientID("234567");
-        p.setPurchaseAmount("989");
-        p.setPurchaseCurrency("AED");
-        p.setRate(4.16f);
-        p.setRateCode("CUS");
-        p.setSaleAmount("238");
-        p.setSaleCurrency("EUR");
-        p.setTransactionID(transactionID);
-        p.setTransactionDate(new DateTime().getMillis());
-        return p;
+        Builder builder = Purchase.newBuilder();
+        builder.setBuySell("b")
+        .setChannel("online")
+        .setClientID("234567")
+        .setPurchaseAmount("989")
+        .setPurchaseCurrency("AED")
+        .setRate(4.16f)
+        .setRateCode("CUS")
+        .setSaleAmount("238")
+        .setSaleCurrency("EUR")
+        .setTransactionID(transactionID)
+        .setTransactionDate(new DateTime().getMillis());
+        log.info("Purchase--" + builder.getTransactionID() + "--"+ TimeUtil.ISOString(builder.getTransactionDate()));
+        return builder.build();
     }
 }

@@ -3,14 +3,18 @@ package io.kubesure.multistream.sources;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.kubesure.multistream.datatypes.Purchase;
+import io.kubesure.multistream.datatypes.Purchase.Builder;
+import io.kubesure.multistream.util.TimeUtil;
 
 public class PurchaseSource implements SourceFunction<Purchase> {
 
    
     private static final long serialVersionUID = -821842602548548856L;
-    //private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
+    private static final Logger log = LoggerFactory.getLogger(PurchaseSource.class);
 
     private long withDelay = 500l;
     private int produce;
@@ -42,19 +46,20 @@ public class PurchaseSource implements SourceFunction<Purchase> {
     }
 
     private Purchase newPurchase(String transactionID) {
-        Purchase p = new Purchase();
-        p.setBuySell("b");
-        p.setChannel("online");
-        p.setClientID("234567");
-        p.setPurchaseAmount("989");
-        p.setPurchaseCurrency("AED");
-        p.setRate(4.16f);
-        p.setRateCode("CUS");
-        p.setSaleAmount("238");
-        p.setSaleCurrency("EUR");
-        p.setTransactionID(transactionID);
-        p.setTransactionDate(new DateTime().getMillis());
-        return p;
+        Builder builder = Purchase.newBuilder();
+        builder.setBuySell("b")
+        .setChannel("online")
+        .setClientID("234567")
+        .setPurchaseAmount("989")
+        .setPurchaseCurrency("AED")
+        .setRate(4.16f)
+        .setRateCode("CUS")
+        .setSaleAmount("238")
+        .setSaleCurrency("EUR")
+        .setTransactionID(transactionID)
+        .setTransactionDate(new DateTime().getMillis());
+        log.debug(TimeUtil.ISOString(builder.getTransactionDate()));
+        return builder.build();
     }
 
     @Override
